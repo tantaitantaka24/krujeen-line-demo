@@ -173,7 +173,7 @@ $('ppId').textContent = cfg.promptPay.id; $('ppName').textContent = cfg.promptPa
 const baht = n => n.toLocaleString('th-TH') + ' ฿';
 const type = () => state.tab === 'fish' ? 'fish' : 'burger';
 const cart = () => state.carts[type()];
-const imgOf = id => IMG((cfg.burgers.concat(cfg.fishSizes).find(x => x.id === id) || {}).img || '');
+const imgOf = id => IMG((cfg.burgers.concat(Store.fishSizes(state.settings && state.settings.fishRound)).find(x => x.id === id) || {}).img || '');
 
 // ---------- เมนูเบอร์เกอร์: แสดงทันทีจาก config ไม่ต้องรอเน็ต ----------
 function renderBurgers() {
@@ -248,18 +248,23 @@ function renderFish() {
   $('fishRound').innerHTML = `<div class="card"><div class="row"><b>🚚 รอบส่ง ${r.label}</b><span class="badge ${closed || !left ? 's-rejected' : 's-ready'}">${closed ? 'ปิดรับแล้ว' : left ? 'เหลือ ' + left + ' ตัว' : 'เต็มแล้ว'}</span></div>
     <div class="progress"><div style="width:${Math.min(100, s.fishBooked / r.quota * 100)}%"></div></div>
     <div class="muted">จองแล้ว ${s.fishBooked}/${r.quota} ตัว${r.closeAt ? ' · ปิดรับ ' + new Date(r.closeAt).toLocaleString('th-TH', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : ''}</div></div>`;
-  $('fishList').innerHTML = closed || !left ? '' : cfg.fishSizes.map(f => {
-    const q = (state.carts.fish.find(i => i.id === f.id) || {}).qty || 0;
+  $('fishList').innerHTML = closed || !left ? '' : Store.fishSizes(r).map(f => {
+    const q = (state.carts.fish.find(i => i.id === f.id) || {}).qty || 0, sizeLeft = fishSizeLeft(f);
     return `<div class="card fish"><img src="${IMG(f.img)}" alt="${f.name}">
-      <div class="grow"><b>${f.name}</b><div style="color:var(--red);font-weight:700">${f.price} ฿ / ตัว</div></div>
-      <span class="stepper"><button onclick="stepFish('${f.id}',-1)" aria-label="ลด">−</button><span>${q}</span><button onclick="stepFish('${f.id}',1)" aria-label="เพิ่ม">+</button></span></div>`;
+      <div class="grow"><b>${f.name}</b><div style="color:var(--red);font-weight:700">${f.price} ฿ / ตัว</div>
+        ${f.quota ? `<div class="muted">${sizeLeft ? 'เหลือ ' + sizeLeft + ' ตัว' : 'ไซซ์นี้หมดแล้ว'}</div>` : ''}</div>
+      ${sizeLeft ? `<span class="stepper"><button onclick="stepFish('${f.id}',-1)" aria-label="ลด">−</button><span>${q}</span><button onclick="stepFish('${f.id}',1)" aria-label="เพิ่ม">+</button></span>` : ''}</div>`;
   }).join('');
 }
+// จำนวนที่ยังจองได้ของไซซ์นี้ (รอบที่ไม่ได้แยกจำนวนตามไซซ์ = ไม่จำกัดรายไซซ์)
+function fishSizeLeft(f) {
+  return f.quota ? Math.max(0, f.quota - ((state.settings.fishBookedBySize || {})[f.id] || 0)) : Infinity;
+}
 function stepFish(id, d) {
-  const f = cfg.fishSizes.find(x => x.id === id);
+  const f = Store.fishSizes(state.settings.fishRound).find(x => x.id === id);
   let it = state.carts.fish.find(i => i.id === id);
   if (!it) { it = { key: id, id, name: f.name, unitPrice: f.price, qty: 0, options: [] }; state.carts.fish.push(it); }
-  it.qty = Math.max(0, it.qty + d);
+  it.qty = Math.min(fishSizeLeft(f), Math.max(0, it.qty + d));
   state.carts.fish = state.carts.fish.filter(i => i.qty > 0);
   renderFish(); renderBar();
 }

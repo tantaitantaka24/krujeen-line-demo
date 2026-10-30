@@ -32,6 +32,11 @@
     return order.items.reduce((s, i) => s + itemPrice(i), 0) + (order.deliveryFee || 0);
   }
 
+  // ไซซ์และราคาปลาของรอบนี้ (รอบที่เปิดก่อนมีฟีเจอร์แก้รอบ ใช้ค่าเริ่มต้นใน config)
+  function fishSizes(round) {
+    return (round && round.sizes) || cfg.fishSizes;
+  }
+
   function today() {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -45,7 +50,8 @@
   const demo = {
     async getSettings() {
       const s = LS.get('demo_settings', { accepting: true, fishRound: null });
-      s.fishBooked = s.fishRound ? fishBooked(LS.get('demo_orders', []), s.fishRound.id) : 0;
+      s.fishBookedBySize = s.fishRound ? fishBookedBySize(LS.get('demo_orders', []), s.fishRound.id) : {};
+      s.fishBooked = Object.values(s.fishBookedBySize).reduce((a, b) => a + b, 0);
       return s;
     },
     async saveSettings(patch) {
@@ -108,9 +114,12 @@
     resetAll() { ['demo_orders', 'demo_customers', 'demo_settings'].forEach(k => localStorage.removeItem(k)); }
   };
 
-  function fishBooked(orders, roundId) {
-    return orders.filter(o => o.fishRoundId === roundId && o.status !== 'rejected' && o.status !== 'cancelled')
-      .reduce((s, o) => s + o.items.reduce((a, i) => a + i.qty, 0), 0);
+  // ยอดจองของรอบ แยกตามไซซ์ { fish160: 3, ... }
+  function fishBookedBySize(orders, roundId) {
+    const out = {};
+    orders.filter(o => o.fishRoundId === roundId && o.status !== 'rejected' && o.status !== 'cancelled')
+      .forEach(o => o.items.forEach(i => out[i.id] = (out[i.id] || 0) + i.qty));
+    return out;
   }
 
   function validate(order, customer, settings) {
@@ -122,6 +131,10 @@
       if (order.channel === 'line' && r.closeAt && new Date() > new Date(r.closeAt)) return 'รอบนี้ปิดรับจองแล้ว';
       const qty = order.items.reduce((a, i) => a + i.qty, 0);
       if (settings.fishBooked + qty > r.quota) return 'รอบนี้เหลือ ' + Math.max(0, r.quota - settings.fishBooked) + ' ตัว';
+      for (const i of order.items) {
+        const size = (r.sizes || []).find(x => x.id === i.id), booked = settings.fishBookedBySize[i.id] || 0;
+        if (size && size.quota && booked + i.qty > size.quota) return size.name + ' เหลือ ' + Math.max(0, size.quota - booked) + ' ตัว';
+      }
     }
     if (order.fulfil === 'delivery' && (!order.address || !order.phone)) return 'กรุณาใส่ที่อยู่และเบอร์โทรสำหรับจัดส่ง';
     order.total = orderTotal(order);
@@ -157,7 +170,7 @@
   };
 
   window.Store = Object.assign({}, DEMO ? demo : remote, {
-    DEMO, itemPrice, orderTotal, payAtShopBlockedReason, today,
+    DEMO, itemPrice, orderTotal, payAtShopBlockedReason, today, fishSizes,
     setPin(p) { pin = p; },
     setIdToken(t) { idToken = t; }
   });

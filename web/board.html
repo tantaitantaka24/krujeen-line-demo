@@ -198,32 +198,53 @@ function render() {
 
 function renderFishPanel() {
   const r = settings.fishRound;
-  if (!r && $('rLabel')) return; // ฟอร์มเปิดรอบอยู่ อย่ารีเฟรชทับสิ่งที่กำลังพิมพ์
+  if ($('rLabel')) return; // ฟอร์มเปิด/แก้รอบอยู่ อย่ารีเฟรชทับสิ่งที่กำลังพิมพ์
   const listOpen = $('fishPanel').querySelector('details')?.open;
   let html = '<h2>🐟 รอบปลากระพง</h2>';
   if (r) {
     const list = orders.filter(o => o.fishRoundId === r.id && o.status !== 'rejected' && o.status !== 'cancelled');
     const unpaid = list.filter(o => !o.paid).length;
-    const bySize = {}; list.forEach(o => o.items.forEach(i => bySize[i.name] = (bySize[i.name] || 0) + i.qty));
+    const booked = settings.fishBookedBySize || {};
     html += `<div><b>รอบส่ง ${esc(r.label)}</b> <span class="muted">ปิดรับ ${r.closeAt ? new Date(r.closeAt).toLocaleString('th-TH', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '-'}</span></div>
       <div class="progress"><div style="width:${Math.min(100, settings.fishBooked / r.quota * 100)}%"></div></div>
       <div class="muted">จองแล้ว ${settings.fishBooked}/${r.quota} ตัว · ${list.length} ราย · ยังไม่จ่าย ${unpaid} ราย</div>
-      <div class="muted">${Object.entries(bySize).map(([k, v]) => esc(k) + ': ' + v + ' ตัว').join(' · ')}</div>
+      <div class="muted">${Store.fishSizes(r).map(s => esc(s.name) + ' ' + s.price + '฿ — จอง ' + (booked[s.id] || 0) + (s.quota ? '/' + s.quota : '') + ' ตัว').join('<br>')}</div>
       <details style="margin-top:8px" ${listOpen ? 'open' : ''}><summary>รายชื่อส่ง/รับ (${list.length})</summary>
         <table>${list.map(o => `<tr><td>#${o.id} ${esc(o.customerName)} ${o.phone ? '· ' + esc(o.phone) : ''}<br><span class="muted">${o.fulfil === 'delivery' ? '🛵 ' + esc(o.address) : '🏠 รับเอง'}</span></td>
           <td style="text-align:right">${o.items.map(i => i.qty).reduce((a, b) => a + b, 0)} ตัว<br><span class="tag ${o.paid ? 't-paid' : 't-unpaid'}">${o.paid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span></td></tr>`).join('')}</table>
       </details>
-      <p><button class="btn ghost sm" onclick="closeRound()">ปิดรอบนี้ / เริ่มรอบใหม่</button></p>`;
+      <p class="row"><button class="btn ghost sm" onclick="editRound()">แก้ไขรอบ</button>
+        <button class="btn ghost sm" onclick="closeRound()">ปิดรอบนี้ / เริ่มรอบใหม่</button></p>`;
   } else {
-    html += `<p class="muted">ยังไม่เปิดรอบ — เปิดรอบแล้วลูกค้าจะจองในไลน์ได้</p>
-      <div class="row">
-        <label>รอบส่ง (ชื่อที่ลูกค้าเห็น)<input id="rLabel" placeholder="ศุกร์ 6 พ.ย."></label>
-        <label>ปิดรับจอง<input id="rClose" type="datetime-local"></label>
-        <label>จำนวนตัว<input id="rQuota" type="number" value="30" style="width:90px"></label>
-        <button class="btn" onclick="openRound()">เปิดรอบ</button>
-      </div><div class="err" id="rErr"></div>`;
+    html += '<p class="muted">ยังไม่เปิดรอบ — เปิดรอบแล้วลูกค้าจะจองในไลน์ได้</p>' + roundForm(null);
   }
   $('fishPanel').innerHTML = html;
+}
+// ฟอร์มเดียวใช้ทั้งเปิดรอบใหม่ (r = null) และแก้รอบที่เปิดอยู่
+function roundForm(r) {
+  const close = r && r.closeAt ? new Date(new Date(r.closeAt) - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
+  return `<div class="row">
+      <label>รอบส่ง (ชื่อที่ลูกค้าเห็น)<input id="rLabel" placeholder="ศุกร์ 6 พ.ย." value="${esc(r && r.label)}"></label>
+      <label>ปิดรับจอง (ว่าง = ไม่กำหนด)<input id="rClose" type="datetime-local" value="${close}"></label>
+      <button class="btn ghost sm" onclick="$('rClose').value = ''">ล้างเวลา</button>
+    </div>
+    <div class="muted" style="margin-top:8px">ไซซ์ ราคาต่อตัว และจำนวนที่รับจอง (เฉพาะรอบนี้) — รวม <b id="rTotal">${Store.fishSizes(r).reduce((a, s) => a + (s.quota || 0), 0)}</b> ตัว</div>
+    <div id="rSizes" oninput="roundTotal()">${Store.fishSizes(r).map(sizeRow).join('')}</div>
+    <button class="btn ghost sm" onclick="$('rSizes').insertAdjacentHTML('beforeend', sizeRow({}))">+ เพิ่มไซซ์</button>
+    <div class="row" style="margin-top:10px"><button class="btn" onclick="saveRound()">${r ? 'บันทึกการแก้ไข' : 'เปิดรอบ'}</button>
+      ${r ? '<button class="btn ghost" onclick="cancelEditRound()">ยกเลิก</button>' : ''}</div>
+    <div class="err" id="rErr"></div>`;
+}
+function sizeRow(s) {
+  const booked = (settings.fishBookedBySize || {})[s.id] || 0;
+  return `<div class="row size-row" data-id="${esc(s.id)}" data-img="${esc(s.img)}" style="margin-top:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px">
+    <input class="sName" placeholder="เช่น ปลากระพง ไซซ์ 200" value="${esc(s.name)}" style="flex:1;min-width:160px">
+    <input class="sPrice" type="number" placeholder="ราคา" value="${s.price || ''}" style="width:90px"> ฿
+    <input class="sQuota" type="number" placeholder="จำนวน" value="${s.quota || ''}" style="width:80px"> ตัว
+    ${booked ? `<span class="muted" style="white-space:nowrap">จองแล้ว ${booked} ตัว (ลบไม่ได้)</span>` : '<button class="btn no sm" onclick="this.parentElement.remove(); roundTotal()">ลบ</button>'}</div>`;
+}
+function roundTotal() {
+  $('rTotal').textContent = [...document.querySelectorAll('#rSizes .sQuota')].reduce((a, x) => a + (+x.value || 0), 0);
 }
 
 // ---------- การกระทำ ----------
@@ -251,11 +272,28 @@ $('accepting').addEventListener('change', e => {
   const v = e.target.checked;
   optimistic(() => { settings.accepting = v; }, () => Store.saveSettings({ accepting: v }));
 });
-async function openRound() {
-  const label = $('rLabel').value.trim(), closeAt = $('rClose').value, quota = +$('rQuota').value;
-  if (!label || !quota) { $('rErr').textContent = 'ใส่ชื่อรอบและจำนวนตัว'; return; }
-  await Store.saveSettings({ fishRound: { id: 'R' + Date.now(), label, closeAt: closeAt ? new Date(closeAt).toISOString() : '', quota } });
-  load();
+function editRound() {
+  $('fishPanel').innerHTML = '<h2>🐟 แก้ไขรอบปลากระพง</h2>' + roundForm(settings.fishRound);
+}
+function cancelEditRound() {
+  $('fishPanel').innerHTML = ''; renderFishPanel();
+}
+async function saveRound() {
+  const r = settings.fishRound;
+  const label = $('rLabel').value.trim(), closeAt = $('rClose').value;
+  const sizes = [...document.querySelectorAll('#rSizes .size-row')].map((row, i) => ({
+    id: row.dataset.id || 's' + Date.now() + i, name: row.querySelector('.sName').value.trim(),
+    price: +row.querySelector('.sPrice').value, quota: +row.querySelector('.sQuota').value, img: row.dataset.img || 'seabass.jpg' }));
+  const quota = sizes.reduce((a, s) => a + s.quota, 0);
+  if (!label) { $('rErr').textContent = 'ใส่ชื่อรอบส่ง'; return; }
+  if (!sizes.length || sizes.some(s => !s.name || !(s.price > 0) || !(s.quota > 0))) { $('rErr').textContent = 'ต้องมีอย่างน้อย 1 ไซซ์ และใส่ชื่อ ราคา จำนวน ให้ครบทุกไซซ์'; return; }
+  const short = sizes.find(s => s.quota < ((settings.fishBookedBySize || {})[s.id] || 0));
+  if (short) { $('rErr').textContent = short.name + ' จองไปแล้ว ' + settings.fishBookedBySize[short.id] + ' ตัว ตั้งจำนวนต่ำกว่านี้ไม่ได้'; return; }
+  // แก้รอบ = ใช้ id เดิม ยอดจองเดิมจึงยังนับอยู่
+  try {
+    await Store.saveSettings({ fishRound: { id: r ? r.id : 'R' + Date.now(), label, closeAt: closeAt ? new Date(closeAt).toISOString() : '', quota, sizes } });
+  } catch (e) { $('rErr').textContent = e.message; return; }
+  $('fishPanel').innerHTML = ''; load();
 }
 async function closeRound() {
   if (!confirm('ปิดรอบนี้? ออเดอร์เดิมยังอยู่ในระบบ')) return;
@@ -270,7 +308,7 @@ function openAdd() {
 }
 function renderAdd() {
   const fishOpen = !!settings.fishRound;
-  const menu = draft.type === 'fish' ? cfg.fishSizes : cfg.burgers;
+  const menu = draft.type === 'fish' ? Store.fishSizes(settings.fishRound) : cfg.burgers;
   const o = { items: draft.items, deliveryFee: 0 };
   $('addBody').innerHTML = `<h2>เพิ่มออเดอร์ร้าน</h2>
     <div class="muted">มาจากช่องทาง</div>
@@ -298,7 +336,7 @@ function keepFields() {
 }
 function addItem(id) {
   keepFields();
-  const m = (draft.type === 'fish' ? cfg.fishSizes : cfg.burgers).find(x => x.id === id);
+  const m = (draft.type === 'fish' ? Store.fishSizes(settings.fishRound) : cfg.burgers).find(x => x.id === id);
   const options = draft.type === 'burger' ? cfg.burgerOptions.filter(x => draft.opts[x.id]).map(x => ({ id: x.id, name: x.name, price: x.price })) : [];
   const key = id + '|' + options.map(x => x.id).join(',');
   const ex = draft.items.find(i => i.key === key);

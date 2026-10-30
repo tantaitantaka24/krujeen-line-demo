@@ -125,7 +125,8 @@ function getCustomer(key) { return readCustomers()[key] || null; }
 
 function getSettings(orders) {
   const s = JSON.parse(props.getProperty('SETTINGS') || '{"accepting":true,"fishRound":null}');
-  s.fishBooked = s.fishRound ? fishBooked(orders || readOrders(), s.fishRound.id) : 0;
+  s.fishBookedBySize = s.fishRound ? fishBookedBySize(orders || readOrders(), s.fishRound.id) : {};
+  s.fishBooked = Object.values(s.fishBookedBySize).reduce((a, b) => a + b, 0);
   return s;
 }
 function saveSettings(patch) {
@@ -134,9 +135,12 @@ function saveSettings(patch) {
   props.setProperty('SETTINGS', JSON.stringify(s));
   return getSettings();
 }
-function fishBooked(orders, roundId) {
-  return orders.filter(o => o.fishRoundId === roundId && o.status !== 'rejected' && o.status !== 'cancelled')
-    .reduce((s, o) => s + o.items.reduce((a, i) => a + i.qty, 0), 0);
+// ยอดจองของรอบ แยกตามไซซ์ { fish160: 3, ... }
+function fishBookedBySize(orders, roundId) {
+  const out = {};
+  orders.filter(o => o.fishRoundId === roundId && o.status !== 'rejected' && o.status !== 'cancelled')
+    .forEach(o => o.items.forEach(i => out[i.id] = (out[i.id] || 0) + i.qty));
+  return out;
 }
 function today() { return Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy-MM-dd'); }
 
@@ -148,10 +152,12 @@ function createOrder(body) {
   } else {
     requirePin(body.pin);
   }
-  // คิดราคาใหม่จากตาราง PRICES
+  // คิดราคาใหม่จากตาราง PRICES (ปลา: ใช้ไซซ์/ราคาที่ตั้งไว้ในรอบ ถ้ารอบนั้นมี)
+  const round = o.type === 'fish' ? JSON.parse(props.getProperty('SETTINGS') || '{}').fishRound : null;
+  const table = round && round.sizes ? Object.fromEntries(round.sizes.map(s => [s.id, Number(s.price)])) : PRICES;
   o.items = o.items.map(i => ({
-    id: i.id, name: String(i.name), qty: Math.max(1, Math.floor(i.qty)), unitPrice: priceOf(i.id),
-    options: (i.options || []).map(x => ({ id: x.id, name: String(x.name), price: priceOf(x.id) }))
+    id: i.id, name: String(i.name), qty: Math.max(1, Math.floor(i.qty)), unitPrice: priceOf(i.id, table),
+    options: (i.options || []).map(x => ({ id: x.id, name: String(x.name), price: priceOf(x.id, table) }))
   }));
   o.deliveryFee = o.fulfil === 'delivery' ? DELIVERY_FEE : 0;
   o.total = o.items.reduce((s, i) => s + (i.unitPrice + i.options.reduce((a, x) => a + x.price, 0)) * i.qty, 0) + o.deliveryFee;
@@ -181,9 +187,9 @@ function createOrder(body) {
   } finally { lock.releaseLock(); }
 }
 
-function priceOf(id) {
-  if (!(id in PRICES)) throw new Error('ไม่พบเมนู ' + id);
-  return PRICES[id];
+function priceOf(id, table) {
+  if (!(id in table)) throw new Error('ไม่พบเมนู ' + id + ' (ร้านอาจแก้ไซซ์ในรอบนี้ กรุณาเปิดหน้าสั่งใหม่)');
+  return table[id];
 }
 
 function validate(o, customer, settings) {
@@ -195,6 +201,10 @@ function validate(o, customer, settings) {
     if (o.channel === 'line' && r.closeAt && new Date() > new Date(r.closeAt)) return 'รอบนี้ปิดรับจองแล้ว';
     const qty = o.items.reduce((a, i) => a + i.qty, 0);
     if (settings.fishBooked + qty > r.quota) return 'รอบนี้เหลือ ' + Math.max(0, r.quota - settings.fishBooked) + ' ตัว';
+    for (const i of o.items) {
+      const size = (r.sizes || []).find(x => x.id === i.id), booked = settings.fishBookedBySize[i.id] || 0;
+      if (size && size.quota && booked + i.qty > size.quota) return size.name + ' เหลือ ' + Math.max(0, size.quota - booked) + ' ตัว';
+    }
   }
   if (o.fulfil === 'delivery' && (!o.address || !o.phone)) return 'กรุณาใส่ที่อยู่และเบอร์โทรสำหรับจัดส่ง';
   if (o.payment === 'shop' && o.channel === 'line') {
