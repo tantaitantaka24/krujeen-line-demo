@@ -33,10 +33,11 @@ function doGet(e) {
     const p = e.parameter;
     switch (p.action) {
       case 'settings': return getSettings();
-      case 'customer': return getCustomer(userFromToken(p.idToken));
+      // หน้าลูกค้าเรียกครั้งเดียวตอนเปิด (แทน settings + customer)
+      case 'init': return { settings: getSettings(), customer: p.idToken ? getCustomer(userFromToken(p.idToken)) : null };
       case 'myOrders': { const k = userFromToken(p.idToken); return readOrders().filter(o => o.customerKey === k).slice(-10).reverse(); }
-      case 'orders': requirePin(p.pin); return listOrders();
-      case 'customers': requirePin(p.pin); return readCustomers();
+      // กระดานร้านเรียกครั้งเดียวต่อรอบรีเฟรช (แทน orders + settings + customers)
+      case 'board': requirePin(p.pin); return boardData();
     }
     throw new Error('unknown action');
   });
@@ -66,15 +67,20 @@ function requirePin(pin) {
   if (!pin || pin !== props.getProperty('STAFF_PIN')) throw new Error('PIN ไม่ถูกต้อง');
 }
 
-// ยืนยันตัวตนลูกค้าจาก LIFF ID token → คืน LINE userId
+// ยืนยันตัวตนลูกค้าจาก LIFF ID token → คืน LINE userId (จำผลไว้ 10 นาที ไม่ต้องถาม LINE ซ้ำทุกครั้ง)
 function userFromToken(idToken) {
   if (!idToken) throw new Error('กรุณาเปิดจาก LINE');
+  const cache = CacheService.getScriptCache();
+  const key = 'tok:' + Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, idToken));
+  const hit = cache.get(key);
+  if (hit) return hit;
   const res = UrlFetchApp.fetch('https://api.line.me/oauth2/v2.1/verify', {
     method: 'post', muteHttpExceptions: true,
     payload: { id_token: idToken, client_id: props.getProperty('LOGIN_CHANNEL_ID') }
   });
   const j = JSON.parse(res.getContentText());
   if (!j.sub) throw new Error('เข้าสู่ระบบหมดอายุ กรุณาเปิดหน้าสั่งใหม่');
+  cache.put(key, j.sub, 600);
   return j.sub;
 }
 
@@ -117,9 +123,9 @@ function saveCustomer(c) {
 }
 function getCustomer(key) { return readCustomers()[key] || null; }
 
-function getSettings() {
+function getSettings(orders) {
   const s = JSON.parse(props.getProperty('SETTINGS') || '{"accepting":true,"fishRound":null}');
-  s.fishBooked = s.fishRound ? fishBooked(readOrders(), s.fishRound.id) : 0;
+  s.fishBooked = s.fishRound ? fishBooked(orders || readOrders(), s.fishRound.id) : 0;
   return s;
 }
 function saveSettings(patch) {
@@ -154,7 +160,7 @@ function createOrder(body) {
   lock.waitLock(10000);
   try {
     const orders = readOrders();
-    const settings = getSettings();
+    const settings = getSettings(orders);
     const customers = readCustomers();
     const customer = customers[o.customerKey] || null;
     const err = validate(o, customer, settings);
@@ -217,9 +223,13 @@ function saveSlip(dataUrl, uid) {
   return file.getUrl(); // ไฟล์เป็นส่วนตัว เปิดได้เฉพาะบัญชีร้าน
 }
 
-function listOrders() {
-  const s = getSettings(), d = today();
-  return readOrders().filter(o => o.date === d || (s.fishRound && o.fishRoundId === s.fishRound.id));
+function boardData() {
+  const all = readOrders(), s = getSettings(all), d = today();
+  return {
+    orders: all.filter(o => o.date === d || (s.fishRound && o.fishRoundId === s.fishRound.id)),
+    settings: s,
+    customers: readCustomers()
+  };
 }
 
 function updateOrder(uid, patch) {
