@@ -1,0 +1,9 @@
+{
+  "name": "ออเดอร์ร้านครูจีน",
+  "short_name": "ออเดอร์ร้าน",
+  "start_url": "board.html",
+  "display": "standalone",
+  "background_color": "#f3f1ec",
+  "theme_color": "#16130e",
+  "icons": [{ "src": "../richmenu/profile-1080.jpg", "sizes": "1080x1080", "type": "image/jpeg" }]
+}

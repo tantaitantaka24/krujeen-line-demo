@@ -8,23 +8,24 @@ window.APP_CONFIG = {
 
   promptPay: { id: '0XX-XXX-XXXX', name: 'ชื่อบัญชีร้าน' },
   deliveryFee: 0,
+  imgBase: '../assets/items/',  // รูปเมนูแต่ละชิ้น
 
   burgers: [
-    { id: 'beef',    name: 'เบอร์เกอร์เนื้อ',      price: 59 },
-    { id: 'chicken', name: 'เบอร์เกอร์ไก่',        price: 49 },
-    { id: 'shrimp',  name: 'เบอร์เกอร์กุ้ง',       price: 49 },
-    { id: 'fish',    name: 'เบอร์เกอร์ปลา',        price: 49 },
-    { id: 'egg2',    name: 'เบอร์เกอร์ดับเบิ้ลไข่', price: 39 },
-    { id: 'kebab',   name: 'เคบับเนื้อเบอร์เกอร์',  price: 60 }
+    { id: 'beef',    name: 'เบอร์เกอร์เนื้อ',      price: 59, img: 'beef.jpg' },
+    { id: 'chicken', name: 'เบอร์เกอร์ไก่',        price: 49, img: 'chicken.jpg' },
+    { id: 'shrimp',  name: 'เบอร์เกอร์กุ้ง',       price: 49, img: 'shrimp.jpg' },
+    { id: 'fish',    name: 'เบอร์เกอร์ปลา',        price: 49, img: 'fish.jpg' },
+    { id: 'egg2',    name: 'เบอร์เกอร์ดับเบิ้ลไข่', price: 39, img: 'egg2.jpg' },
+    { id: 'kebab',   name: 'เคบับเนื้อเบอร์เกอร์',  price: 60, img: 'kebab.jpg' }
   ],
   burgerOptions: [
-    { id: 'cheese',   name: 'เพิ่มชีส',      price: 15 },
-    { id: 'egg',      name: 'เพิ่มไข่',      price: 10 },
-    { id: 'charcoal', name: 'ขนมปังชาโคล', price: 10 }
+    { id: 'cheese',   name: 'เพิ่มชีส',      price: 15, img: 'opt-cheese.jpg' },
+    { id: 'egg',      name: 'เพิ่มไข่',      price: 10, img: 'opt-egg.jpg' },
+    { id: 'charcoal', name: 'ขนมปังชาโคล', price: 10, img: 'opt-charcoal.jpg' }
   ],
   fishSizes: [
-    { id: 'fish160', name: 'ปลากระพง ไซซ์ 160', price: 160 },
-    { id: 'fish180', name: 'ปลากระพง ไซซ์ 180', price: 180 }
+    { id: 'fish160', name: 'ปลากระพง ไซซ์ 160', price: 160, img: 'seabass.jpg' },
+    { id: 'fish180', name: 'ปลากระพง ไซซ์ 180', price: 180, img: 'seabass.jpg' }
   ],
 
   // กติกาการยืนยันออเดอร์ (ดู docs/SPEC.md หัวข้อ 7)

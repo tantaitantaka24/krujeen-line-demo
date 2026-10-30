@@ -1,6 +1,8 @@
 // ชั้นข้อมูล: ถ้า config.apiUrl ว่าง ใช้โหมดเดโม (localStorage) ไม่งั้นเรียก Apps Script
 (function () {
   const cfg = window.APP_CONFIG;
+  // ?demo ต่อท้าย URL = บังคับโหมดเดโม (ไว้ทดสอบ/โชว์โดยไม่แตะข้อมูลจริง)
+  if (new URLSearchParams(location.search).has('demo')) { cfg.apiUrl = ''; cfg.liffId = ''; }
   const DEMO = !cfg.apiUrl;
 
   // ---------- กติกา (ต้องตรงกับ apps-script/Code.gs) ----------
@@ -50,7 +52,9 @@
       LS.set('demo_settings', Object.assign(LS.get('demo_settings', { accepting: true, fishRound: null }), patch));
       return demo.getSettings();
     },
-    async getCustomer(key) { return LS.get('demo_customers', {})[key] || null; },
+    async init(key) {
+      return { settings: await demo.getSettings(), customer: key ? LS.get('demo_customers', {})[key] || null : null };
+    },
     async createOrder(order) {
       const orders = LS.get('demo_orders', []);
       const customers = LS.get('demo_customers', {});
@@ -76,10 +80,11 @@
     async myOrders(key) {
       return LS.get('demo_orders', []).filter(o => o.customerKey === key).slice(-10).reverse();
     },
-    async listOrders() {
+    async boardData() {
       const s = await demo.getSettings();
       const d = today();
-      return LS.get('demo_orders', []).filter(o => o.date === d || (s.fishRound && o.fishRoundId === s.fishRound.id));
+      const orders = LS.get('demo_orders', []).filter(o => o.date === d || (s.fishRound && o.fishRoundId === s.fishRound.id));
+      return { orders, settings: s, customers: LS.get('demo_customers', {}) };
     },
     async updateOrder(uid, patch) {
       const orders = LS.get('demo_orders', []);
@@ -93,7 +98,6 @@
       LS.set('demo_orders', orders);
       return o;
     },
-    async listCustomers() { return LS.get('demo_customers', {}); },
     async flagCustomer(key, requireTransfer) {
       const c = LS.get('demo_customers', {});
       if (!c[key]) c[key] = { key, name: key, completed: 0, requireTransfer: false };
@@ -144,12 +148,11 @@
   const remote = {
     getSettings: () => get('settings'),
     saveSettings: patch => post('saveSettings', { patch }),
-    getCustomer: key => get('customer', { key }),
+    init: () => get('init'),
     createOrder: order => post('createOrder', { order }),
     myOrders: key => get('myOrders', { key }),
-    listOrders: () => get('orders'),
+    boardData: () => get('board'),
     updateOrder: (uid, patch) => post('updateOrder', { uid, patch }),
-    listCustomers: () => get('customers'),
     flagCustomer: (key, requireTransfer) => post('flagCustomer', { key, requireTransfer })
   };
 

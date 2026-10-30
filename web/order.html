@@ -5,56 +5,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สั่งเบอร์เกอร์ & จองปลา</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#f6f4ef; --card:#fff; --ink:#1d1b16; --muted:#6b675d; --line:#e4e0d6; --brand:#ffb81c; --brand-ink:#3a2a00; --red:#d62b1f; --ok:#1e8a4c; --warn:#b26a00; }
-  * { box-sizing:border-box; }
+  :root { --bg:#f6f4ef; --card:#fff; --ink:#1d1b16; --muted:#6b675d; --line:#e7e2d6; --brand:#ffb81c; --brand-ink:#3a2a00; --dark:#16130e; --red:#d62b1f; --ok:#1e8a4c; --warn:#b26a00; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { margin:0; font-family:'Prompt',system-ui,sans-serif; background:var(--bg); color:var(--ink); font-size:16px; }
-  header { background:#16130e; color:#fff; padding:14px 16px 0; position:sticky; top:0; z-index:5; }
-  header h1 { margin:0 0 10px; font-size:19px; font-weight:600; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+  header { background:var(--dark); color:#fff; padding:12px 16px 10px; position:sticky; top:0; z-index:10; }
+  header h1 { margin:0 0 10px; font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
   header h1 span { color:var(--brand); }
-  .tabs { display:flex; gap:4px; }
-  .tabs button { flex:1; background:none; border:0; color:#cfc9bb; font:inherit; font-size:15px; padding:10px 4px; border-bottom:3px solid transparent; }
-  .tabs button.on { color:#fff; border-color:var(--brand); }
-  main { padding:12px 16px 120px; max-width:560px; margin:0 auto; }
-  .demo { background:#fff6db; border:1px dashed var(--brand); border-radius:10px; padding:10px 12px; font-size:14px; margin-bottom:12px; }
+  .tabs { display:flex; background:#2a251c; border-radius:12px; padding:3px; gap:3px; }
+  .tabs button { flex:1; border:0; background:none; color:#cfc9bb; padding:9px 4px; border-radius:9px; font-size:15px; font-weight:500; }
+  .tabs button.on { background:var(--brand); color:var(--brand-ink); }
+  main { padding:14px 16px 130px; max-width:560px; margin:0 auto; }
+  .demo { background:#fff6db; border:1px dashed var(--brand); border-radius:12px; padding:10px 12px; font-size:14px; margin-bottom:12px; }
   .demo input { margin-top:6px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px; margin-bottom:10px; }
-  .item { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-  .item b { font-weight:500; }
-  .price { color:var(--red); font-weight:600; white-space:nowrap; }
-  .opts { margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
-  .chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:999px; padding:6px 12px; margin:0 6px 6px 0; font-size:14px; background:#fff; }
-  .chip.on { background:var(--brand); border-color:var(--brand); color:var(--brand-ink); }
-  .stepper { display:inline-flex; align-items:center; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
-  .stepper button { width:38px; height:38px; border:0; background:#f1eee6; font-size:20px; }
-  .stepper span { min-width:34px; text-align:center; }
-  .btn { display:block; width:100%; border:0; border-radius:12px; padding:13px; font:inherit; font-weight:500; font-size:16px; background:var(--brand); color:var(--brand-ink); }
-  .btn.ghost { background:#fff; border:1px solid var(--line); color:var(--ink); }
-  .btn.small { display:inline-block; width:auto; padding:8px 14px; font-size:14px; }
-  label.f { display:block; font-size:14px; color:var(--muted); margin:10px 0 4px; }
-  input, textarea { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; }
-  .seg { display:flex; gap:6px; }
-  .seg button { flex:1; padding:10px; border:1px solid var(--line); border-radius:10px; background:#fff; font:inherit; font-size:15px; }
-  .seg button.on { background:#16130e; color:#fff; border-color:#16130e; }
-  h2 { font-size:17px; font-weight:500; margin:18px 0 8px; }
+  .banner { background:#fde4e1; border:1px solid #f3b8b1; color:var(--red); border-radius:12px; padding:10px 12px; margin-bottom:12px; font-size:15px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .tile { position:relative; background:var(--card); border:0; border-radius:16px; overflow:hidden; padding:0; text-align:left; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+  .tile img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; background:#eee; }
+  .tile .t { padding:8px 10px 10px; }
+  .tile .n { font-size:15px; font-weight:500; line-height:1.3; min-height:39px; padding-right:28px; }
+  .tile .p { color:var(--red); font-weight:700; font-size:17px; margin-top:2px; }
+  .tile .plus { position:absolute; right:8px; bottom:10px; width:34px; height:34px; border-radius:50%; background:var(--brand); color:var(--brand-ink); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:600; }
+  .tile .qty { position:absolute; top:8px; right:8px; background:var(--dark); color:#fff; border-radius:999px; min-width:28px; height:28px; padding:0 8px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; }
+  .card { background:var(--card); border-radius:16px; padding:14px; margin-bottom:12px; box-shadow:0 1px 2px rgba(0,0,0,.06); }
   .muted { color:var(--muted); font-size:14px; }
+  .progress { height:10px; background:#eee; border-radius:6px; overflow:hidden; margin:8px 0 6px; }
+  .progress div { height:100%; background:var(--brand); }
+  .fish { display:flex; gap:12px; align-items:center; }
+  .fish img { width:96px; height:72px; object-fit:cover; border-radius:12px; flex:none; }
+  .fish .grow { flex:1; }
+  .stepper { display:inline-flex; align-items:center; background:#f1eee6; border-radius:12px; }
+  .stepper button { width:42px; height:42px; border:0; background:none; font-size:22px; font-weight:500; }
+  .stepper span { min-width:26px; text-align:center; font-weight:600; }
+  .skeleton { height:90px; border-radius:16px; background:linear-gradient(90deg,#eee,#f6f6f6,#eee); background-size:200% 100%; animation:sh 1.2s infinite; margin-bottom:12px; }
+  @keyframes sh { to { background-position:-200% 0; } }
+
+  /* แผงเลือกเมนู (bottom sheet) */
+  .sheet-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:30; display:flex; align-items:flex-end; justify-content:center; }
+  .sheet { background:#fff; width:100%; max-width:560px; border-radius:20px 20px 0 0; max-height:92vh; overflow:auto; padding-bottom:calc(16px + env(safe-area-inset-bottom)); animation:up .18s ease-out; }
+  @keyframes up { from { transform:translateY(40px); opacity:.6; } }
+  .sheet img.hero { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; }
+  .sheet .body { padding:14px 16px 0; }
+  .sheet h3 { margin:0; font-size:20px; font-weight:600; }
+  .opts { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0 14px; }
+  .opt { border:2px solid var(--line); background:#fff; border-radius:14px; padding:0 0 6px; overflow:hidden; text-align:center; position:relative; }
+  .opt img { width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+  .opt .on-mark { display:none; position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:var(--ok); color:#fff; font-size:14px; line-height:22px; }
+  .opt.on { border-color:var(--ok); background:#f0faf3; }
+  .opt.on .on-mark { display:block; }
+  .opt div { font-size:13px; line-height:1.25; padding:5px 4px 0; }
+  .opt b { font-size:13px; color:var(--red); }
+  .row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .btn { display:block; width:100%; border:0; border-radius:14px; padding:14px; font-weight:600; font-size:17px; background:var(--brand); color:var(--brand-ink); }
+  .btn:disabled { opacity:.6; }
+  .btn.ghost { background:#fff; border:1px solid var(--line); color:var(--ink); font-weight:500; }
+  .x-close { z-index:2; position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:50%; border:0; background:rgba(0,0,0,.55); color:#fff; font-size:20px; }
+
+  /* ตะกร้า / checkout */
+  h2 { font-size:17px; font-weight:600; margin:18px 0 8px; }
+  .cl { display:flex; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); }
+  .cl:last-child { border:0; }
+  .cl img { width:56px; height:42px; object-fit:cover; border-radius:8px; flex:none; }
+  .cl .grow { flex:1; min-width:0; font-size:15px; }
+  .seg { display:flex; gap:8px; }
+  .seg button { flex:1; padding:12px 6px; border:2px solid var(--line); border-radius:12px; background:#fff; font-size:15px; font-weight:500; }
+  .seg button.on { border-color:var(--dark); background:var(--dark); color:#fff; }
+  label.f { display:block; font-size:14px; color:var(--muted); margin:12px 0 4px; }
+  input, textarea { width:100%; font:inherit; padding:12px; border:1px solid var(--line); border-radius:12px; background:#fff; }
   .err { color:var(--red); font-size:14px; margin-top:8px; }
-  .cartline { display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid var(--line); font-size:15px; }
-  .cartline:last-child { border:0; }
-  .x { border:0; background:none; color:var(--red); font-size:14px; }
-  .bar { position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); }
-  .bar .in { max-width:560px; margin:0 auto; display:flex; gap:10px; align-items:center; }
-  .bar .total { font-size:18px; font-weight:600; white-space:nowrap; }
-  .badge { font-size:12px; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .back { border:0; background:none; color:var(--muted); padding:0; font-size:15px; margin-bottom:4px; }
+
+  .bar { position:fixed; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--line); padding:10px 16px calc(10px + env(safe-area-inset-bottom)); z-index:20; }
+  .bar .in { max-width:560px; margin:0 auto; display:flex; gap:12px; align-items:center; }
+  .bar .total { font-size:19px; font-weight:700; white-space:nowrap; }
+  .badge { font-size:12px; padding:3px 10px; border-radius:999px; white-space:nowrap; font-weight:500; }
   .s-pending { background:#fff1d6; color:var(--warn); } .s-confirmed { background:#e3f1ff; color:#0b5cad; }
   .s-ready { background:#e2f5e9; color:var(--ok); } .s-done { background:#eee; color:#555; } .s-rejected { background:#fde4e1; color:var(--red); }
-  .progress { height:10px; background:#eee; border-radius:6px; overflow:hidden; margin:6px 0; }
-  .progress div { height:100%; background:var(--brand); }
-  .poster { width:100%; border-radius:12px; display:block; margin-bottom:8px; }
-  .hide { display:none !important; }
   .done-box { text-align:center; padding:30px 10px; }
-  .done-box .big { font-size:40px; }
+  .done-box .big { font-size:52px; }
+  .hide { display:none !important; }
 </style>
 </head>
 <body>
@@ -69,39 +100,28 @@
 
 <main>
   <div id="demoBox" class="demo hide">
-    <b>โหมดเดโม</b> — ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น ใส่ชื่อเพื่อจำลองว่าเป็นลูกค้าคนไหน
+    <b>โหมดเดโม</b> — ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น ใส่ชื่อเพื่อจำลองลูกค้า
     <input id="demoName" placeholder="ชื่อลูกค้า เช่น คุณเอ">
   </div>
-  <div id="closedBox" class="card hide" style="background:#fde4e1;border-color:#f3b8b1">ร้านปิดรับออเดอร์ชั่วคราว ขออภัยครับ</div>
+  <div id="closedBox" class="banner hide">ร้านปิดรับออเดอร์ชั่วคราว ขออภัยครับ</div>
 
-  <section id="tab-burger">
-    <div id="burgerList"></div>
-    <details class="card"><summary class="muted">ดูรูปเมนู</summary>
-      <img class="poster" src="../assets/menu-burgers.jpg" alt="เมนูเบอร์เกอร์">
-      <img class="poster" src="../assets/menu-kebab.jpg" alt="เคบับเนื้อเบอร์เกอร์">
-      <img class="poster" src="../assets/burger-charcoal.jpg" alt="เบอร์เกอร์ขนมปังชาโคล">
-    </details>
-  </section>
+  <section id="v-burger"><div class="grid" id="burgerGrid"></div></section>
 
-  <section id="tab-fish" class="hide">
-    <div id="fishRound" class="card"></div>
+  <section id="v-fish" class="hide">
+    <div id="fishRound"><div class="skeleton"></div></div>
     <div id="fishList"></div>
-    <img class="poster" src="../assets/fish-seabass.jpg" alt="ปลากระพงสด">
   </section>
 
-  <section id="checkout" class="hide">
-    <h2>ตะกร้า</h2>
+  <section id="v-checkout" class="hide">
+    <button class="back" onclick="showMenu()">‹ กลับไปเลือกเมนู</button>
     <div class="card" id="cartBox"></div>
 
     <h2>รับของ</h2>
-    <div class="seg" id="fulfilSeg">
-      <button data-v="pickup" class="on">รับเอง</button>
-      <button data-v="delivery">ให้ร้านไปส่ง</button>
-    </div>
+    <div class="seg" id="fulfilSeg"><button data-v="pickup" class="on">🏠 รับเอง</button><button data-v="delivery">🛵 ให้ร้านไปส่ง</button></div>
     <div id="timeBox">
       <label class="f">เวลาที่ต้องการ</label>
       <div class="seg" id="timeSeg"><button data-v="asap" class="on">เร็วที่สุด</button><button data-v="at">เลือกเวลา</button></div>
-      <input id="timeAt" type="time" class="hide" style="margin-top:6px">
+      <input id="timeAt" type="time" class="hide" style="margin-top:8px">
     </div>
     <label class="f">ชื่อ</label><input id="custName" autocomplete="name">
     <label class="f">เบอร์โทร <span id="phoneReq"></span></label><input id="phone" type="tel" inputmode="tel" autocomplete="tel">
@@ -109,33 +129,32 @@
     <label class="f">หมายเหตุ</label><input id="note" placeholder="ไม่ใส่ผัก, ซอสแยก">
 
     <h2>จ่ายเงิน</h2>
-    <div class="seg" id="paySeg">
-      <button data-v="transfer" class="on">โอนเงิน</button>
-      <button data-v="shop">จ่ายหน้าร้าน / ปลายทาง</button>
-    </div>
-    <div id="transferBox" class="card" style="margin-top:8px">
+    <div class="seg" id="paySeg"><button data-v="transfer" class="on">💸 โอนเงิน</button><button data-v="shop">💵 จ่ายหน้าร้าน</button></div>
+    <div id="transferBox" class="card" style="margin-top:10px">
       <div class="muted">โอนพร้อมเพย์</div>
-      <div><b id="ppId"></b> — <span id="ppName"></span></div>
+      <div style="font-size:18px"><b id="ppId"></b></div>
+      <div class="muted" id="ppName"></div>
       <label class="f">แนบสลิป</label>
       <input id="slip" type="file" accept="image/*">
-      <img id="slipPreview" class="poster hide" style="max-width:160px;margin-top:8px" alt="สลิป">
+      <img id="slipPreview" class="hide" style="max-width:140px;border-radius:10px;margin-top:8px" alt="สลิป">
     </div>
-    <div id="shopNote" class="muted hide" style="margin-top:8px">ออเดอร์จะรอร้านยืนยันก่อน ร้านจะทักกลับในแชทถ้ามีคำถาม</div>
+    <div id="shopNote" class="muted hide" style="margin-top:8px">ออเดอร์จะรอร้านยืนยันก่อน ร้านอาจทักกลับในแชท</div>
     <div id="payErr" class="err"></div>
   </section>
 
-  <section id="tab-mine" class="hide"><div id="mineList"></div></section>
-
-  <section id="doneBox" class="done-box hide"></section>
+  <section id="v-mine" class="hide"><div id="mineList"></div></section>
+  <section id="v-done" class="done-box hide"></section>
 </main>
 
 <div class="bar" id="bar">
   <div class="in">
     <div><div class="muted" id="barCount">ยังไม่ได้เลือก</div><div class="total" id="barTotal">0 ฿</div></div>
-    <button class="btn" id="submitBtn" style="flex:1">สั่งเลย</button>
+    <button class="btn" id="barBtn" style="flex:1">ถัดไป ›</button>
   </div>
   <div class="err" id="submitErr" style="text-align:center;max-width:560px;margin:4px auto 0"></div>
 </div>
+
+<div id="sheet" class="sheet-bg hide"></div>
 
 <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <script src="config.js"></script>
@@ -143,95 +162,97 @@
 <script>
 const cfg = window.APP_CONFIG;
 const $ = id => document.getElementById(id);
+const IMG = f => cfg.imgBase + f;
 const STATUS = { pending:'รอร้านยืนยัน', confirmed:'ร้านรับแล้ว', ready:'พร้อมแล้ว', done:'เสร็จ', rejected:'ร้านไม่รับ', cancelled:'ยกเลิก' };
-const state = { tab:'burger', carts:{ burger:[], fish:[] }, open:null, opts:{}, qty:1,
+const state = { tab:'burger', view:'menu', carts:{ burger:[], fish:[] }, pick:null,
   fulfil:'pickup', time:'asap', pay:'transfer', slip:null, user:null, settings:null, customer:null, inLiff:false };
 
-$('shopName').innerHTML = cfg.shopName.replace('ครูจีน', '<span>ครูจีน</span>');
+$('shopName').innerHTML = '🍔 ' + cfg.shopName.replace('ครูจีน', '<span>ครูจีน</span>');
 $('ppId').textContent = cfg.promptPay.id; $('ppName').textContent = cfg.promptPay.name;
 
-function baht(n) { return n.toLocaleString('th-TH') + ' ฿'; }
-function cart() { return state.carts[state.tab === 'fish' ? 'fish' : 'burger']; }
-function orderType() { return state.tab === 'fish' ? 'fish' : 'burger'; }
+const baht = n => n.toLocaleString('th-TH') + ' ฿';
+const type = () => state.tab === 'fish' ? 'fish' : 'burger';
+const cart = () => state.carts[type()];
+const imgOf = id => IMG((cfg.burgers.concat(cfg.fishSizes).find(x => x.id === id) || {}).img || '');
 
-// ---------- ผู้ใช้ ----------
-async function initUser() {
-  if (cfg.liffId) {
-    await liff.init({ liffId: cfg.liffId });
-    if (!liff.isLoggedIn()) { liff.login(); return; }
-    const p = await liff.getProfile();
-    state.user = { key: p.userId, name: p.displayName };
-    Store.setIdToken(liff.getIDToken());
-    state.inLiff = liff.isInClient();
-  } else {
-    $('demoBox').classList.remove('hide');
-    const saved = localStorage.getItem('demo_user') || '';
-    $('demoName').value = saved;
-    const setDemo = () => {
-      const n = $('demoName').value.trim();
-      localStorage.setItem('demo_user', n);
-      state.user = n ? { key: 'demo:' + n, name: n } : null;
-      if (n && !$('custName').value) $('custName').value = n;
-      loadCustomer();
-    };
-    $('demoName').addEventListener('change', setDemo);
-    setDemo();
-  }
-  if (state.user) { $('custName').value = state.user.name; if (cfg.liffId) loadCustomer(); }
-}
-async function loadCustomer() {
-  state.customer = state.user ? await Store.getCustomer(state.user.key) : null;
-  renderPay();
-}
-
-// ---------- เมนูเบอร์เกอร์ ----------
+// ---------- เมนูเบอร์เกอร์: แสดงทันทีจาก config ไม่ต้องรอเน็ต ----------
 function renderBurgers() {
-  $('burgerList').innerHTML = cfg.burgers.map(b => {
-    const open = state.open === b.id;
-    return `<div class="card">
-      <div class="item" onclick="toggleItem('${b.id}')"><b>${b.name}</b><span class="price">${b.price} ฿</span></div>
-      ${open ? `<div class="opts">
-        ${cfg.burgerOptions.map(o => `<span class="chip ${state.opts[o.id] ? 'on' : ''}" onclick="toggleOpt('${o.id}')">${o.name} +${o.price}</span>`).join('')}
-        <div class="item" style="margin-top:6px">
-          <span class="stepper"><button onclick="stepQty(-1)">−</button><span>${state.qty}</span><button onclick="stepQty(1)">+</button></span>
-          <button class="btn small" onclick="addBurger('${b.id}')">ใส่ตะกร้า ${baht(lineTotal(b))}</button>
-        </div></div>` : ''}
-    </div>`;
+  $('burgerGrid').innerHTML = cfg.burgers.map((b, i) => {
+    const q = state.carts.burger.filter(x => x.id === b.id).reduce((s, x) => s + x.qty, 0);
+    return `<button class="tile" onclick="openPick('${b.id}')">
+      <img src="${IMG(b.img)}" alt="${b.name}" ${i > 3 ? 'loading="lazy"' : ''}>
+      ${q ? `<span class="qty">${q}</span>` : ''}
+      <div class="t"><div class="n">${b.name}</div><div class="p">${b.price} ฿</div></div>
+      <span class="plus">+</span>
+    </button>`;
   }).join('');
 }
-function lineTotal(b) {
-  return (b.price + cfg.burgerOptions.filter(o => state.opts[o.id]).reduce((s, o) => s + o.price, 0)) * state.qty;
+
+function openPick(id) {
+  state.pick = { id, opts: {}, qty: 1 };
+  renderPick();
+  $('sheet').classList.remove('hide');
 }
-function toggleItem(id) { state.open = state.open === id ? null : id; state.opts = {}; state.qty = 1; renderBurgers(); }
-function toggleOpt(id) { state.opts[id] = !state.opts[id]; renderBurgers(); }
-function stepQty(d) { state.qty = Math.max(1, state.qty + d); renderBurgers(); }
-function addBurger(id) {
-  const b = cfg.burgers.find(x => x.id === id);
-  const options = cfg.burgerOptions.filter(o => state.opts[o.id]).map(o => ({ id: o.id, name: o.name, price: o.price }));
-  const key = id + '|' + options.map(o => o.id).join(',');
+function closePick() { $('sheet').classList.add('hide'); state.pick = null; }
+$('sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closePick(); });
+function pickTotal() {
+  const b = cfg.burgers.find(x => x.id === state.pick.id);
+  return (b.price + cfg.burgerOptions.filter(o => state.pick.opts[o.id]).reduce((s, o) => s + o.price, 0)) * state.pick.qty;
+}
+function renderPick() {
+  const b = cfg.burgers.find(x => x.id === state.pick.id);
+  $('sheet').innerHTML = `<div class="sheet" style="position:relative">
+    <button class="x-close" onclick="closePick()" aria-label="ปิด">×</button>
+    <img class="hero" src="${IMG(b.img)}" alt="${b.name}">
+    <div class="body">
+      <div class="row"><h3>${b.name}</h3><span style="color:var(--red);font-weight:700;font-size:20px">${b.price} ฿</span></div>
+      <div class="muted" style="margin-top:10px">เพิ่มความอร่อย (เลือกได้หลายอย่าง)</div>
+      <div class="opts">${cfg.burgerOptions.map(o => `<button class="opt" id="opt-${o.id}" onclick="togglePickOpt('${o.id}')">
+        <span class="on-mark">✓</span><img src="${IMG(o.img)}" alt=""><div>${o.name}<br><b>+${o.price}</b></div></button>`).join('')}</div>
+      <div class="row" style="margin-bottom:14px">
+        <span class="muted">จำนวน</span>
+        <span class="stepper"><button onclick="stepPick(-1)" aria-label="ลด">−</button><span id="pickQty">1</span><button onclick="stepPick(1)" aria-label="เพิ่ม">+</button></span>
+      </div>
+      <button class="btn" id="pickAdd" onclick="addPick()">ใส่ตะกร้า · ${baht(pickTotal())}</button>
+    </div></div>`;
+}
+// อัปเดตเฉพาะจุด ไม่สร้างแผงใหม่ (กันจอกระพริบ)
+function updatePick() {
+  cfg.burgerOptions.forEach(o => $('opt-' + o.id).classList.toggle('on', !!state.pick.opts[o.id]));
+  $('pickQty').textContent = state.pick.qty;
+  $('pickAdd').textContent = 'ใส่ตะกร้า · ' + baht(pickTotal());
+}
+function togglePickOpt(id) { state.pick.opts[id] = !state.pick.opts[id]; updatePick(); }
+function stepPick(d) { state.pick.qty = Math.max(1, state.pick.qty + d); updatePick(); }
+function addPick() {
+  const b = cfg.burgers.find(x => x.id === state.pick.id);
+  const options = cfg.burgerOptions.filter(o => state.pick.opts[o.id]).map(o => ({ id: o.id, name: o.name, price: o.price }));
+  const key = b.id + '|' + options.map(o => o.id).join(',');
   const ex = state.carts.burger.find(i => i.key === key);
-  if (ex) ex.qty += state.qty;
-  else state.carts.burger.push({ key, id, name: b.name, unitPrice: b.price, qty: state.qty, options });
-  state.open = null; renderBurgers(); renderCart();
+  if (ex) ex.qty += state.pick.qty;
+  else state.carts.burger.push({ key, id: b.id, name: b.name, unitPrice: b.price, qty: state.pick.qty, options });
+  closePick(); renderBurgers(); renderBar();
 }
 
 // ---------- ปลา ----------
 function renderFish() {
-  const s = state.settings, r = s && s.fishRound;
+  const s = state.settings;
+  if (!s) return; // ยังโหลดอยู่ (แสดง skeleton)
+  const r = s.fishRound;
   if (!r) {
-    $('fishRound').innerHTML = '<b>ยังไม่เปิดรอบจอง</b><div class="muted">ติดตามประกาศรอบถัดไปในแชทร้าน</div>';
+    $('fishRound').innerHTML = '<div class="card"><b>ยังไม่เปิดรอบจอง</b><div class="muted">ติดตามประกาศรอบถัดไปในแชทร้าน</div></div>';
     $('fishList').innerHTML = ''; return;
   }
   const left = Math.max(0, r.quota - s.fishBooked);
   const closed = r.closeAt && new Date() > new Date(r.closeAt);
-  $('fishRound').innerHTML = `<b>รอบส่ง ${r.label}</b>
-    <div class="muted">ปิดรับ ${r.closeAt ? new Date(r.closeAt).toLocaleString('th-TH', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '-'}</div>
+  $('fishRound').innerHTML = `<div class="card"><div class="row"><b>🚚 รอบส่ง ${r.label}</b><span class="badge ${closed || !left ? 's-rejected' : 's-ready'}">${closed ? 'ปิดรับแล้ว' : left ? 'เหลือ ' + left + ' ตัว' : 'เต็มแล้ว'}</span></div>
     <div class="progress"><div style="width:${Math.min(100, s.fishBooked / r.quota * 100)}%"></div></div>
-    <div class="muted">${closed ? 'ปิดรับจองแล้ว' : 'เหลือ ' + left + ' จาก ' + r.quota + ' ตัว'}</div>`;
+    <div class="muted">จองแล้ว ${s.fishBooked}/${r.quota} ตัว${r.closeAt ? ' · ปิดรับ ' + new Date(r.closeAt).toLocaleString('th-TH', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : ''}</div></div>`;
   $('fishList').innerHTML = closed || !left ? '' : cfg.fishSizes.map(f => {
     const q = (state.carts.fish.find(i => i.id === f.id) || {}).qty || 0;
-    return `<div class="card item"><div><b>${f.name}</b><div class="price">${f.price} ฿ / ตัว</div></div>
-      <span class="stepper"><button onclick="stepFish('${f.id}',-1)">−</button><span>${q}</span><button onclick="stepFish('${f.id}',1)">+</button></span></div>`;
+    return `<div class="card fish"><img src="${IMG(f.img)}" alt="${f.name}">
+      <div class="grow"><b>${f.name}</b><div style="color:var(--red);font-weight:700">${f.price} ฿ / ตัว</div></div>
+      <span class="stepper"><button onclick="stepFish('${f.id}',-1)" aria-label="ลด">−</button><span>${q}</span><button onclick="stepFish('${f.id}',1)" aria-label="เพิ่ม">+</button></span></div>`;
   }).join('');
 }
 function stepFish(id, d) {
@@ -240,32 +261,54 @@ function stepFish(id, d) {
   if (!it) { it = { key: id, id, name: f.name, unitPrice: f.price, qty: 0, options: [] }; state.carts.fish.push(it); }
   it.qty = Math.max(0, it.qty + d);
   state.carts.fish = state.carts.fish.filter(i => i.qty > 0);
-  renderFish(); renderCart();
+  renderFish(); renderBar();
 }
 
-// ---------- ตะกร้า + checkout ----------
+// ---------- แถบล่าง + checkout ----------
 function currentOrder() {
   const items = cart().map(i => ({ id: i.id, name: i.name, unitPrice: i.unitPrice, qty: i.qty, options: i.options }));
-  const o = { type: orderType(), channel: 'line', items, fulfil: state.fulfil, payment: state.pay,
+  const o = { type: type(), channel: 'line', items, fulfil: state.fulfil, payment: state.pay,
     deliveryFee: state.fulfil === 'delivery' ? cfg.deliveryFee : 0 };
   o.total = Store.orderTotal(o);
   return o;
 }
-function renderCart() {
-  const c = cart(), o = currentOrder();
-  const show = (state.tab === 'burger' || state.tab === 'fish') && c.length;
-  $('checkout').classList.toggle('hide', !show);
-  $('cartBox').innerHTML = c.map((i, n) => `<div class="cartline">
-    <div>${i.name}${i.options.length ? '<div class="muted">' + i.options.map(x => x.name).join(', ') + '</div>' : ''}</div>
-    <div style="text-align:right;white-space:nowrap">x${i.qty} · ${baht(Store.itemPrice(i))}<br><button class="x" onclick="removeLine(${n})">ลบ</button></div></div>`).join('')
-    + (o.deliveryFee ? `<div class="cartline"><div>ค่าส่ง</div><div>${baht(o.deliveryFee)}</div></div>` : '');
-  const count = c.reduce((s, i) => s + i.qty, 0);
-  $('barCount').textContent = count ? count + (state.tab === 'fish' ? ' ตัว' : ' ชิ้น') : 'ยังไม่ได้เลือก';
+function renderBar() {
+  const c = cart(), o = currentOrder(), n = c.reduce((s, i) => s + i.qty, 0);
+  $('bar').classList.toggle('hide', state.tab === 'mine' || state.view === 'done');
+  $('barCount').textContent = n ? 'ตะกร้า ' + n + (type() === 'fish' ? ' ตัว' : ' ชิ้น') : 'ยังไม่ได้เลือก';
   $('barTotal').textContent = baht(o.total);
-  $('timeBox').classList.toggle('hide', state.tab === 'fish');
+  $('barBtn').textContent = state.view === 'checkout' ? 'ยืนยันสั่ง' : 'ถัดไป ›';
+  $('barBtn').disabled = !n;
+  if (state.view === 'checkout') renderCheckout();
+}
+function renderCheckout() {
+  const c = cart(), o = currentOrder();
+  $('cartBox').innerHTML = c.map((i, n) => `<div class="cl"><img src="${imgOf(i.id)}" alt="">
+    <div class="grow">${i.name}${i.options.length ? '<div class="muted">+ ' + i.options.map(x => x.name).join(', ') + '</div>' : ''}</div>
+    <div style="text-align:right;white-space:nowrap">x${i.qty}<br><b>${baht(Store.itemPrice(i))}</b></div>
+    <button class="back" style="color:var(--red);margin:0 0 0 4px" onclick="removeLine(${n})" aria-label="ลบ">✕</button></div>`).join('')
+    + (o.deliveryFee ? `<div class="cl"><div class="grow">ค่าส่ง</div><b>${baht(o.deliveryFee)}</b></div>` : '');
+  $('timeBox').classList.toggle('hide', type() === 'fish');
   renderPay();
 }
-function removeLine(n) { cart().splice(n, 1); renderCart(); if (state.tab === 'fish') renderFish(); }
+function removeLine(n) {
+  cart().splice(n, 1);
+  if (!cart().length) showMenu(); else renderBar();
+  renderBurgers(); renderFish();
+}
+function showCheckout() {
+  state.view = 'checkout';
+  ['v-burger', 'v-fish'].forEach(id => $(id).classList.add('hide'));
+  $('v-checkout').classList.remove('hide');
+  window.scrollTo(0, 0); renderBar();
+}
+function showMenu() {
+  state.view = 'menu';
+  $('v-checkout').classList.add('hide');
+  $('v-' + state.tab).classList.remove('hide');
+  $('submitErr').textContent = '';
+  renderBar();
+}
 
 function seg(id, key, after) {
   $(id).addEventListener('click', e => {
@@ -275,15 +318,13 @@ function seg(id, key, after) {
     after && after();
   });
 }
-seg('fulfilSeg', 'fulfil', () => { $('addrBox').classList.toggle('hide', state.fulfil !== 'delivery'); $('phoneReq').textContent = state.fulfil === 'delivery' ? '(จำเป็น)' : ''; renderCart(); });
+seg('fulfilSeg', 'fulfil', () => { $('addrBox').classList.toggle('hide', state.fulfil !== 'delivery'); $('phoneReq').textContent = state.fulfil === 'delivery' ? '(จำเป็น)' : ''; renderBar(); });
 seg('timeSeg', 'time', () => $('timeAt').classList.toggle('hide', state.time !== 'at'));
 seg('paySeg', 'pay', renderPay);
-
 function renderPay() {
   $('transferBox').classList.toggle('hide', state.pay !== 'transfer');
   $('shopNote').classList.toggle('hide', state.pay !== 'shop');
-  const o = currentOrder();
-  $('payErr').textContent = Store.payAtShopBlockedReason(o, state.customer);
+  $('payErr').textContent = Store.payAtShopBlockedReason(currentOrder(), state.customer);
 }
 
 $('slip').addEventListener('change', async e => {
@@ -310,81 +351,110 @@ function orderText(o) {
   return `🧾 ออเดอร์ #${o.id}\n${lines.join('\n')}\nรวม ${o.total} บาท\n${o.fulfil === 'delivery' ? '🛵 ส่ง' : '🏠 รับเอง'} · ${when}\n${o.payment === 'transfer' ? '💸 โอนแล้ว (แนบสลิป)' : '💵 จ่ายหน้าร้าน/ปลายทาง'}`;
 }
 
-$('submitBtn').addEventListener('click', async () => {
+$('barBtn').addEventListener('click', () => state.view === 'checkout' ? submit() : showCheckout());
+
+async function submit() {
   const err = $('submitErr'); err.textContent = '';
-  if (state.tab === 'mine') { switchTab('burger'); return; }
-  if (!state.user) { err.textContent = cfg.liffId ? 'กรุณาเข้าสู่ระบบ LINE' : 'ใส่ชื่อลูกค้าในกล่องโหมดเดโมก่อน'; window.scrollTo(0, 0); return; }
+  if (!state.user) { err.textContent = cfg.liffId ? 'กำลังเชื่อมต่อ LINE ลองอีกครั้ง' : 'ใส่ชื่อลูกค้าในกล่องโหมดเดโมก่อน'; return; }
+  if (type() === 'fish' && !(state.settings && state.settings.fishRound)) { err.textContent = 'ยังไม่เปิดรอบจองปลา'; return; }
   const o = currentOrder();
-  if (!o.items.length) { err.textContent = 'ยังไม่ได้เลือกเมนู'; return; }
   Object.assign(o, {
     customerKey: state.user.key, customerName: $('custName').value.trim() || state.user.name,
     phone: $('phone').value.trim(), address: $('address').value.trim(), note: $('note').value.trim(),
-    time: state.tab === 'fish' ? '' : (state.time === 'at' ? $('timeAt').value : 'asap'),
+    time: o.type === 'fish' ? '' : (state.time === 'at' ? $('timeAt').value : 'asap'),
     fishRoundId: o.type === 'fish' ? state.settings.fishRound.id : '', slip: state.pay === 'transfer' ? state.slip : null
   });
-  if (o.payment === 'transfer' && !o.slip) { err.textContent = 'กรุณาแนบสลิป หรือเลือกจ่ายหน้าร้าน'; return; }
-  if (o.fulfil === 'delivery' && (!o.phone || !o.address)) { err.textContent = 'กรุณาใส่เบอร์โทรและที่อยู่จัดส่ง'; return; }
-  if (state.time === 'at' && o.type === 'burger' && !o.time) { err.textContent = 'กรุณาเลือกเวลา'; return; }
-  $('submitBtn').disabled = true; $('submitBtn').textContent = 'กำลังส่ง…';
+  if (o.payment === 'transfer' && !o.slip) { err.textContent = 'แนบสลิป หรือเลือกจ่ายหน้าร้าน'; return; }
+  if (o.fulfil === 'delivery' && (!o.phone || !o.address)) { err.textContent = 'ใส่เบอร์โทรและที่อยู่จัดส่ง'; return; }
+  if (state.time === 'at' && o.type === 'burger' && !o.time) { err.textContent = 'เลือกเวลา'; return; }
+  const blocked = Store.payAtShopBlockedReason(o, state.customer);
+  if (blocked) { err.textContent = blocked; return; }
+  $('barBtn').disabled = true; $('barBtn').textContent = 'กำลังส่ง…';
   try {
     const saved = await Store.createOrder(o);
     if (state.inLiff) { try { await liff.sendMessages([{ type: 'text', text: orderText(saved) }]); } catch (e) {} }
     state.carts[saved.type] = [];
     showDone(saved);
-  } catch (e) { err.textContent = e.message; }
-  $('submitBtn').disabled = false; $('submitBtn').textContent = 'สั่งเลย';
-});
+  } catch (e) { err.textContent = e.message; renderBar(); }
+}
 
 function showDone(o) {
-  ['tab-burger', 'tab-fish', 'tab-mine', 'checkout'].forEach(id => $(id).classList.add('hide'));
-  $('bar').classList.add('hide');
-  $('doneBox').classList.remove('hide');
-  $('doneBox').innerHTML = `<div class="big">${o.status === 'pending' ? '⏳' : '✅'}</div>
-    <h2>ออเดอร์ #${o.id}</h2>
+  state.view = 'done';
+  ['v-burger', 'v-fish', 'v-mine', 'v-checkout'].forEach(id => $(id).classList.add('hide'));
+  $('v-done').classList.remove('hide');
+  renderBar(); renderBurgers();
+  $('v-done').innerHTML = `<div class="big">${o.status === 'pending' ? '⏳' : '✅'}</div>
+    <h2 style="font-size:22px">ออเดอร์ #${o.id}</h2>
     <p><span class="badge s-${o.status}">${STATUS[o.status]}</span></p>
-    <p class="muted">${o.status === 'pending' ? 'รอร้านกดยืนยันสักครู่ ดูสถานะได้ที่ "ออเดอร์ของฉัน"' : 'ร้านได้รับออเดอร์แล้ว ขอบคุณครับ'}</p>
-    <p><b>${baht(o.total)}</b></p>
-    <button class="btn ghost" onclick="switchTab('mine')">ดูออเดอร์ของฉัน</button>
-    ${state.inLiff ? '<button class="btn" style="margin-top:8px" onclick="liff.closeWindow()">กลับไปที่แชท</button>' : ''}`;
+    <p class="muted">${o.status === 'pending' ? 'รอร้านกดยืนยันสักครู่ ดูสถานะได้ที่แท็บ "ของฉัน"' : 'ร้านได้รับออเดอร์แล้ว ขอบคุณครับ'}</p>
+    <p style="font-size:20px"><b>${baht(o.total)}</b></p>
+    ${state.inLiff ? '<button class="btn" onclick="liff.closeWindow()">กลับไปที่แชท</button>' : ''}
+    <button class="btn ghost" style="margin-top:8px" onclick="switchTab('mine')">ดูออเดอร์ของฉัน</button>`;
 }
 
 // ---------- ออเดอร์ของฉัน ----------
 async function renderMine() {
-  if (!state.user) { $('mineList').innerHTML = '<p class="muted">ใส่ชื่อลูกค้าก่อน</p>'; return; }
+  if (!state.user) { $('mineList').innerHTML = '<p class="muted">กำลังเชื่อมต่อ…</p>'; return; }
+  $('mineList').innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
   const list = await Store.myOrders(state.user.key);
   $('mineList').innerHTML = list.length ? list.map(o => `<div class="card">
-    <div class="item"><b>#${o.id} · ${o.type === 'fish' ? 'ปลากระพง' : 'เบอร์เกอร์'}</b><span class="badge s-${o.status}">${STATUS[o.status]}</span></div>
-    <div class="muted">${o.items.map(i => i.name + ' x' + i.qty).join(', ')}</div>
-    <div class="item"><span class="muted">${new Date(o.createdAt).toLocaleString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</span><span class="price">${baht(o.total)}</span></div>
+    <div class="row"><b>#${o.id} ${o.type === 'fish' ? '🐟' : '🍔'}</b><span class="badge s-${o.status}">${STATUS[o.status]}</span></div>
+    <div class="muted" style="margin:4px 0">${o.items.map(i => i.name + ' x' + i.qty).join(', ')}</div>
+    <div class="row"><span class="muted">${new Date(o.createdAt).toLocaleString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</span><b style="color:var(--red)">${baht(o.total)}</b></div>
   </div>`).join('') : '<p class="muted">ยังไม่มีออเดอร์</p>';
 }
 
 // ---------- แท็บ ----------
 function switchTab(t) {
-  state.tab = t;
+  state.tab = t; state.view = 'menu';
   document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
-  ['burger', 'fish', 'mine'].forEach(x => $('tab-' + x).classList.toggle('hide', x !== t));
-  $('doneBox').classList.add('hide');
-  $('bar').classList.toggle('hide', t === 'mine');
+  ['burger', 'fish', 'mine', 'checkout', 'done'].forEach(x => $('v-' + x).classList.toggle('hide', x !== t));
+  $('submitErr').textContent = '';
   if (t === 'mine') renderMine();
-  if (t === 'fish') refreshSettings();
-  renderCart();
+  if (t === 'fish') renderFish();
+  renderBar();
 }
 document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) switchTab(b.dataset.tab); });
 
-async function refreshSettings() {
-  state.settings = await Store.getSettings();
-  $('closedBox').classList.toggle('hide', state.settings.accepting);
-  renderFish();
+// ---------- เริ่ม: แสดงเมนูก่อน แล้วค่อยเชื่อม LINE/หลังบ้านเบื้องหลัง ----------
+function applyInit(r) {
+  state.settings = r.settings; state.customer = r.customer;
+  $('closedBox').classList.toggle('hide', r.settings.accepting);
+  renderFish(); if (state.view === 'checkout') renderPay();
+}
+async function connect() {
+  if (cfg.liffId) {
+    await liff.init({ liffId: cfg.liffId });
+    if (!liff.isLoggedIn()) { liff.login(); return; }
+    state.inLiff = liff.isInClient();
+    const p = await liff.getProfile();
+    state.user = { key: p.userId, name: p.displayName };
+    Store.setIdToken(liff.getIDToken());
+    $('custName').value = p.displayName;
+    const t = new URLSearchParams(location.search).get('tab'); // LIFF ส่ง query มาหลัง init
+    if (t && t !== state.tab && ['fish', 'mine'].includes(t)) switchTab(t);
+    else if (state.tab === 'mine') renderMine();
+    applyInit(await Store.init());
+  } else {
+    $('demoBox').classList.remove('hide');
+    const setDemo = async () => {
+      const n = $('demoName').value.trim();
+      localStorage.setItem('demo_user', n);
+      state.user = n ? { key: 'demo:' + n, name: n } : null;
+      if (n) $('custName').value = n;
+      applyInit(await Store.init(state.user && state.user.key));
+      if (state.tab === 'mine') renderMine();
+    };
+    $('demoName').value = localStorage.getItem('demo_user') || '';
+    $('demoName').addEventListener('change', setDemo);
+    await setDemo();
+  }
 }
 
-(async function start() {
-  await initUser();
-  const t = new URLSearchParams(location.search).get('tab'); // อ่านหลัง liff.init เพราะ LIFF ส่ง query มาทีหลัง
-  await refreshSettings();
-  renderBurgers();
-  switchTab(['burger', 'fish', 'mine'].includes(t) ? t : 'burger');
-})();
+renderBurgers();
+const t0 = new URLSearchParams(location.search).get('tab');
+switchTab(['burger', 'fish', 'mine'].includes(t0) ? t0 : 'burger');
+connect().catch(e => { $('submitErr').textContent = 'เชื่อมต่อไม่สำเร็จ: ' + e.message; });
 </script>
 </body>
 </html>
