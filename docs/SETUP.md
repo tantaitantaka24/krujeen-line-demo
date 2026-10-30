@@ -11,10 +11,20 @@
 | หน้าเว็บ (GitHub Pages) | https://tantaitantaka24.github.io/krujeen-line-demo/web/order.html |
 | กระดานร้าน | https://tantaitantaka24.github.io/krujeen-line-demo/web/board.html |
 | Google Sheet | "ออเดอร์ร้านครูจีน (เดโม)" |
-| Apps Script | "หลังบ้านร้านครูจีน (เดโม)" — Script Properties ครบ 4 ค่า |
+| Apps Script | "หลังบ้านร้านครูจีน (เดโม)" (ผูกกับชีต) — Script Properties ครบ 4 ค่า |
+| Script ID | `1hwYcyK1m_jrrsZROs7luttroxV_ufFtgiyLh3CJ-jat29jS1pgq7TAxD` (อยู่ใน `apps-script/.clasp.json`) |
+| Web app deployment | `AKfycby2uWJErT5Y2JMzsLe-bciZH5sOWHI5raKzqOU4D9dRbU3r9usEjm8Xmv-pyL4kcyWSXw` (= `apiUrl` ใน `web/config.js`) |
+| บัญชี Google ที่ clasp ใช้ | tantaiyipz@gmail.com |
 
 แก้หน้าเว็บ: แก้ไฟล์ใน `web/` แล้ว `git push` (GitHub Pages อัปเดตเองภายใน ~1 นาที)
-แก้ `Code.gs`: วางโค้ดใหม่ใน Apps Script → Deploy → Manage deployments → แก้ไข → New version
+
+แก้ `Code.gs`: อัปเดตหลังบ้านด้วย clasp จากโฟลเดอร์ `apps-script/` (ทำหลังบ้านก่อน แล้วค่อย push หน้าเว็บ)
+```bash
+cd apps-script && clasp push -f && clasp deploy -i AKfycby2uWJErT5Y2JMzsLe-bciZH5sOWHI5raKzqOU4D9dRbU3r9usEjm8Xmv-pyL4kcyWSXw -d "สรุปสิ่งที่แก้"
+```
+- ต้อง deploy ด้วย `-i` deployment เดิมเสมอ URL `/exec` จึงไม่เปลี่ยน (ไม่ต้องแก้ `config.js`)
+- เช็คว่าขึ้นแล้ว: `clasp deployments` ต้องเห็นเลขเวอร์ชันใหม่ที่ deployment นี้
+- ก่อน push ถ้าไม่แน่ใจว่ามีคนแก้โค้ดในหน้า Apps Script ตรง ๆ ให้ `clasp pull` มาเทียบก่อน (pull จะเขียนทับ `Code.gs` ในเครื่อง — commit งานไว้ก่อน)
 
 ทำตามลำดับ ใช้เวลาประมาณ 1–2 ชั่วโมงในครั้งแรก ทุกบริการในคู่มือนี้ใช้ฟรี
 
@@ -62,7 +72,7 @@ python3 -m http.server 8765
 5. กลับไป LINE Developers → Messaging API channel → Webhook URL = Web app URL → เปิด **Use webhook**
    - ปุ่ม Verify อาจขึ้น error เพราะ Apps Script ตอบแบบ redirect — ทดสอบจริงด้วยการสั่งของแทน
 
-> แก้โค้ด Apps Script ทีหลัง: Deploy → Manage deployments → แก้ไข → Version: New version (URL เดิมใช้ต่อได้)
+> แก้โค้ด Apps Script ทีหลัง: ใช้ clasp ตามหัวข้อด้านบน หรือในหน้าเว็บ Deploy → Manage deployments → แก้ไข → Version: New version (URL เดิมใช้ต่อได้)
 
 ## 4. ใส่ค่าใน `web/config.js` แล้วอัปโหลดหน้าเว็บ
 1. แก้ `web/config.js`:

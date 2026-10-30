@@ -93,4 +93,5 @@ web/store.js       ชั้นข้อมูล: โหมดเดโม (เ
 web/order.html     หน้าสั่งของลูกค้า (LIFF)
 web/board.html     กระดานคิวเจ้าของร้าน
 apps-script/Code.gs  หลังบ้าน: บันทึก Google Sheet, ตอบ LINE
+apps-script/appsscript.json + .clasp.json  ตั้งค่า clasp สำหรับ push/deploy หลังบ้าน (ดู docs/SETUP.md)
 ```
