@@ -422,10 +422,15 @@ function switchTab(t) {
 document.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) switchTab(b.dataset.tab); });
 
 // ---------- เริ่ม: แสดงเมนูก่อน แล้วค่อยเชื่อม LINE/หลังบ้านเบื้องหลัง ----------
-function applyInit(r) {
-  state.settings = r.settings; state.customer = r.customer;
-  $('closedBox').classList.toggle('hide', r.settings.accepting);
+function applySettings(s) {
+  state.settings = s;
+  if (!Store.DEMO) try { localStorage.setItem('last_settings', JSON.stringify(s)); } catch (e) {}
+  $('closedBox').classList.toggle('hide', s.accepting);
   renderFish(); if (state.view === 'checkout') renderPay();
+}
+function applyInit(r) {
+  state.initDone = true; state.customer = r.customer;
+  applySettings(r.settings);
 }
 async function connect() {
   if (cfg.liffId) {
@@ -459,6 +464,11 @@ async function connect() {
 renderBurgers();
 const t0 = new URLSearchParams(location.search).get('tab');
 switchTab(['burger', 'fish', 'mine'].includes(t0) ? t0 : 'burger');
+// รอบปลา: แสดงค่าจากครั้งก่อนทันที แล้วขอค่าล่าสุดจากหลังบ้านพร้อมกับเชื่อม LINE (ไม่ต้องรอ LINE เสร็จก่อน)
+if (!Store.DEMO) {
+  try { const s = JSON.parse(localStorage.getItem('last_settings')); if (s) applySettings(s); } catch (e) {}
+  Store.getSettings().then(s => { if (!state.initDone) applySettings(s); }).catch(() => {});
+}
 connect().catch(e => { $('submitErr').textContent = 'เชื่อมต่อไม่สำเร็จ: ' + e.message; });
 </script>
 </body>
