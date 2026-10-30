@@ -1,5 +1,21 @@
 # คู่มือติดตั้ง (จากโหมดเดโมในเครื่อง → ใช้งานจริงใน LINE)
 
+## สิ่งที่ติดตั้งแล้วสำหรับเดโม (30 ต.ค. 2569)
+| ส่วน | ค่า |
+|---|---|
+| LINE OA | ร้านครูจีน เดโม `@699gazwu` (เพิ่มเพื่อน: https://line.me/R/ti/p/@699gazwu) |
+| Provider | ระบบร้านค้า ครูจีน |
+| Messaging API channel | 2012288930 |
+| LINE Login channel | 2012289018 (Published) |
+| LIFF | `2012289018-moWlUmNn` → https://liff.line.me/2012289018-moWlUmNn |
+| หน้าเว็บ (GitHub Pages) | https://tantaitantaka24.github.io/krujeen-line-demo/web/order.html |
+| กระดานร้าน | https://tantaitantaka24.github.io/krujeen-line-demo/web/board.html |
+| Google Sheet | "ออเดอร์ร้านครูจีน (เดโม)" |
+| Apps Script | "หลังบ้านร้านครูจีน (เดโม)" — Script Properties ครบ 4 ค่า |
+
+แก้หน้าเว็บ: แก้ไฟล์ใน `web/` แล้ว `git push` (GitHub Pages อัปเดตเองภายใน ~1 นาที)
+แก้ `Code.gs`: วางโค้ดใหม่ใน Apps Script → Deploy → Manage deployments → แก้ไข → New version
+
 ทำตามลำดับ ใช้เวลาประมาณ 1–2 ชั่วโมงในครั้งแรก ทุกบริการในคู่มือนี้ใช้ฟรี
 
 ## 0. ลองโหมดเดโมในเครื่องก่อน (ไม่ต้องตั้งค่าอะไร)
