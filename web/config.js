@@ -3,7 +3,7 @@ window.APP_CONFIG = {
   shopName: 'ร้านเบอร์เกอร์ครูจีน',
 
   // เว้นว่างทั้งสองค่า = โหมดเดโม (ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น)
-  liffId: '',  // จาก LINE Developers > LINE Login channel > LIFF
+  liffId: '2012289018-moWlUmNn',  // จาก LINE Developers > LINE Login channel > LIFF
   apiUrl: 'https://script.google.com/macros/s/AKfycby2uWJErT5Y2JMzsLe-bciZH5sOWHI5raKzqOU4D9dRbU3r9usEjm8Xmv-pyL4kcyWSXw/exec',  // URL ของ Apps Script web app (ลงท้าย /exec)
 
   promptPay: { id: '0XX-XXX-XXXX', name: 'ชื่อบัญชีร้าน' },
