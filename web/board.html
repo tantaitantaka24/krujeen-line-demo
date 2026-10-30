@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>กระดานออเดอร์</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#f3f1ec; --card:#fff; --ink:#1d1b16; --muted:#6b675d; --line:#e2ded3; --brand:#ffb81c; --brand-ink:#3a2a00; --red:#d62b1f; --ok:#1e8a4c; --warn:#b26a00; --blue:#0b5cad; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Prompt',system-ui,sans-serif; background:var(--bg); color:var(--ink); font-size:15px; }
+  header { background:#16130e; color:#fff; padding:12px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
+  header h1 { margin:0; font-size:18px; font-weight:600; flex:1; }
+  main { padding:12px 16px 40px; max-width:1100px; margin:0 auto; }
+  .btn { border:0; border-radius:10px; padding:9px 14px; font:inherit; font-weight:500; background:var(--brand); color:var(--brand-ink); cursor:pointer; }
+  .btn.ghost { background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .btn.ok { background:var(--ok); color:#fff; } .btn.no { background:#fff; color:var(--red); border:1px solid #f0b9b3; }
+  .btn.sm { padding:6px 10px; font-size:14px; }
+  .toggle { display:flex; align-items:center; gap:8px; font-size:14px; }
+  .toggle input { width:20px; height:20px; }
+  .metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:14px; }
+  .metric { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; }
+  .metric .l { font-size:13px; color:var(--muted); } .metric .v { font-size:22px; font-weight:600; }
+  .cols { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; align-items:start; }
+  .col h2 { font-size:15px; font-weight:500; margin:4px 0 8px; display:flex; justify-content:space-between; }
+  .count { background:#16130e; color:#fff; border-radius:999px; padding:0 9px; font-size:13px; }
+  .o { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+  .o.pending { border-color:var(--brand); border-width:2px; }
+  .o .top { display:flex; justify-content:space-between; gap:6px; align-items:center; }
+  .o .id { font-weight:600; }
+  .o ul { margin:6px 0; padding-left:18px; } .o li { margin:2px 0; }
+  .muted { color:var(--muted); font-size:13px; }
+  .tag { font-size:12px; padding:2px 8px; border-radius:999px; background:#eee; white-space:nowrap; }
+  .t-line { background:#e1f6e6; color:#13723a; } .t-phone { background:#e3edff; color:var(--blue); } .t-messenger { background:#ece6ff; color:#5a3db8; }
+  .t-facebook { background:#e3edff; color:#1b4fa0; } .t-walkin { background:#f2eee4; color:#6b5a2c; }
+  .t-unpaid { background:#fde4e1; color:var(--red); } .t-paid { background:#e2f5e9; color:var(--ok); } .t-flag { background:#fde4e1; color:var(--red); }
+  .acts { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .slip { width:54px; height:54px; object-fit:cover; border-radius:6px; border:1px solid var(--line); cursor:pointer; vertical-align:middle; }
+  section.panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px; margin:14px 0; }
+  section.panel h2 { font-size:16px; font-weight:500; margin:0 0 8px; }
+  .progress { height:12px; background:#eee; border-radius:6px; overflow:hidden; margin:6px 0; }
+  .progress div { height:100%; background:var(--brand); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:end; }
+  .row label { font-size:13px; color:var(--muted); display:flex; flex-direction:column; gap:3px; }
+  input, select, textarea { font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:9px; background:#fff; }
+  .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:flex-start; justify-content:center; padding:20px 10px; overflow:auto; z-index:20; }
+  .modal { background:#fff; border-radius:16px; padding:16px; width:100%; max-width:520px; }
+  .modal h2 { margin:0 0 10px; font-size:18px; font-weight:500; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+  .chip { border:1px solid var(--line); border-radius:999px; padding:7px 12px; background:#fff; font:inherit; font-size:14px; cursor:pointer; }
+  .chip.on { background:#16130e; color:#fff; border-color:#16130e; }
+  .chip.opt.on { background:var(--brand); color:var(--brand-ink); border-color:var(--brand); }
+  .menu-btn { border:1px solid var(--line); border-radius:10px; padding:10px; background:#faf8f3; font:inherit; text-align:left; cursor:pointer; }
+  .menu-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:6px; }
+  .err { color:var(--red); font-size:14px; margin-top:6px; }
+  .hide { display:none !important; }
+  table { width:100%; border-collapse:collapse; font-size:14px; } td { padding:4px 0; border-bottom:1px solid var(--line); }
+  details summary { cursor:pointer; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>กระดานออเดอร์ <span id="demoTag" class="tag hide" style="background:var(--brand);color:var(--brand-ink)">โหมดเดโม</span></h1>
+  <label class="toggle"><input type="checkbox" id="accepting"> เปิดรับออเดอร์</label>
+  <button class="btn" id="addBtn">+ ออเดอร์ร้าน</button>
+</header>
+
+<div id="pinGate" class="modal-bg hide">
+  <div class="modal">
+    <h2>ใส่ PIN พนักงาน</h2>
+    <input id="pinInput" type="password" inputmode="numeric" style="width:100%">
+    <div class="err" id="pinErr"></div>
+    <button class="btn" id="pinBtn" style="margin-top:10px;width:100%">เข้าใช้</button>
+  </div>
+</div>
+
+<main>
+  <div class="metrics" id="metrics"></div>
+  <div class="cols">
+    <div class="col"><h2>รอยืนยัน <span class="count" id="c-pending">0</span></h2><div id="l-pending"></div></div>
+    <div class="col"><h2>รับแล้ว / กำลังทำ <span class="count" id="c-confirmed">0</span></h2><div id="l-confirmed"></div></div>
+    <div class="col"><h2>พร้อมรับ / ส่ง <span class="count" id="c-ready">0</span></h2><div id="l-ready"></div></div>
+  </div>
+
+  <section class="panel" id="fishPanel"></section>
+
+  <section class="panel">
+    <h2>สรุปวันนี้ (เบอร์เกอร์)</h2>
+    <div id="summary"></div>
+  </section>
+
+  <section class="panel">
+    <details><summary>เสร็จแล้ว / ไม่รับ วันนี้ (<span id="c-closed">0</span>)</summary><div id="l-closed" style="margin-top:8px"></div></details>
+  </section>
+
+  <p id="demoTools" class="hide"><button class="btn ghost sm" id="resetBtn">ล้างข้อมูลเดโมทั้งหมด</button></p>
+</main>
+
+<div id="addModal" class="modal-bg hide"><div class="modal" id="addBody"></div></div>
+
+<script src="config.js"></script>
+<script src="store.js"></script>
+<script>
+const cfg = window.APP_CONFIG;
+const $ = id => document.getElementById(id);
+const CH = { line:'LINE', phone:'โทร', messenger:'Messenger', facebook:'โพสต์เฟส', walkin:'หน้าร้าน' };
+let orders = [], settings = null, customers = {}, lastSeen = null;
+
+function baht(n) { return n.toLocaleString('th-TH') + ' ฿'; }
+function esc(s) { return String(s || '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c])); }
+function hhmm(iso) { return new Date(iso).toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }); }
+
+// ---------- โหลดข้อมูล ----------
+async function load() {
+  [orders, settings, customers] = await Promise.all([Store.listOrders(), Store.getSettings(), Store.listCustomers()]);
+  const ids = orders.map(o => o.uid);
+  if (lastSeen && ids.some(id => !lastSeen.includes(id))) beep();
+  lastSeen = ids;
+  render();
+}
+function beep() {
+  try {
+    const a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator(), g = a.createGain();
+    o.frequency.value = 880; o.connect(g); g.connect(a.destination); g.gain.value = 0.2; o.start(); o.stop(a.currentTime + 0.35);
+  } catch (e) {}
+}
+
+// ---------- แสดงผล ----------
+function card(o) {
+  const c = customers[o.customerKey] || {};
+  const when = o.type === 'fish' ? 'รอบปลา' : (o.time === 'asap' || !o.time ? 'เร็วที่สุด' : o.time);
+  const acts = {
+    pending:   `<button class="btn ok sm" onclick="setStatus('${o.uid}','confirmed')">รับออเดอร์</button><button class="btn no sm" onclick="setStatus('${o.uid}','rejected')">ไม่รับ</button>`,
+    confirmed: `<button class="btn sm" onclick="setStatus('${o.uid}','ready')">พร้อมแล้ว</button>`,
+    ready:     `<button class="btn ok sm" onclick="setStatus('${o.uid}','done')">เสร็จ / ส่งแล้ว</button>`
+  }[o.status] || '';
+  return `<div class="o ${o.status}">
+    <div class="top"><span class="id">#${o.id} ${o.type === 'fish' ? '🐟' : '🍔'}</span>
+      <span><span class="tag t-${o.channel}">${CH[o.channel]}</span> <span class="muted">${hhmm(o.createdAt)}</span></span></div>
+    <div><b>${esc(o.customerName)}</b> ${o.phone ? '· <a href="tel:' + esc(o.phone) + '">' + esc(o.phone) + '</a>' : ''}
+      ${c.requireTransfer ? '<span class="tag t-flag">ต้องโอนก่อน</span>' : ''}
+      ${c.completed ? '<span class="muted">· มาแล้ว ' + c.completed + ' ครั้ง</span>' : (o.channel === 'line' ? '<span class="muted">· ลูกค้าใหม่</span>' : '')}</div>
+    <ul>${o.items.map(i => `<li>${esc(i.name)}${i.options && i.options.length ? ' <span class="muted">+ ' + i.options.map(x => esc(x.name)).join(', ') + '</span>' : ''} <b>x${i.qty}</b></li>`).join('')}</ul>
+    <div class="muted">${o.fulfil === 'delivery' ? '🛵 ส่ง: ' + esc(o.address) : '🏠 รับเอง'} · ${when}${o.note ? '<br>📝 ' + esc(o.note) : ''}</div>
+    <div class="top" style="margin-top:6px">
+      <span><b>${baht(o.total)}</b> <span class="tag ${o.paid ? 't-paid' : 't-unpaid'}">${o.paid ? 'รับเงินแล้ว' : (o.payment === 'transfer' ? 'โอน (รอตรวจ)' : 'ยังไม่จ่าย')}</span></span>
+      ${!o.slip ? '' : o.slip.startsWith('data:') ? `<img class="slip" src="${esc(o.slip)}" onclick="window.open(this.src)" alt="สลิป">` : `<a href="${esc(o.slip)}" target="_blank">ดูสลิป</a>`}
+    </div>
+    <div class="acts">${acts}
+      <button class="btn ghost sm" onclick="togglePaid('${o.uid}', ${!o.paid})">${o.paid ? 'ยกเลิกรับเงิน' : 'รับเงินแล้ว'}</button>
+      ${o.customerKey && o.channel === 'line' ? `<button class="btn ghost sm" onclick="flag('${esc(o.customerKey)}', ${!c.requireTransfer})">${c.requireTransfer ? 'ยกเลิกป้ายต้องโอน' : 'ติดป้ายต้องโอนก่อน'}</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function render() {
+  $('accepting').checked = settings.accepting;
+  const today = Store.today();
+  const burgers = orders.filter(o => o.type === 'burger' && o.date === today);
+  const active = orders.filter(o => o.date === today || o.type === 'fish');
+  ['pending', 'confirmed', 'ready'].forEach(s => {
+    const list = active.filter(o => o.status === s).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    $('l-' + s).innerHTML = list.map(card).join('') || '<p class="muted">—</p>';
+    $('c-' + s).textContent = list.length;
+  });
+  const closed = orders.filter(o => o.date === today && ['done', 'rejected', 'cancelled'].includes(o.status));
+  $('l-closed').innerHTML = closed.map(card).join('') || '<p class="muted">—</p>';
+  $('c-closed').textContent = closed.length;
+  document.title = (active.filter(o => o.status === 'pending').length ? '(' + active.filter(o => o.status === 'pending').length + ') ' : '') + 'กระดานออเดอร์';
+
+  const valid = burgers.filter(o => o.status !== 'rejected' && o.status !== 'cancelled');
+  const sum = valid.reduce((s, o) => s + o.total, 0), paid = valid.filter(o => o.paid).reduce((s, o) => s + o.total, 0);
+  const pieces = valid.reduce((s, o) => s + o.items.reduce((a, i) => a + i.qty, 0), 0);
+  $('metrics').innerHTML = [
+    ['ยอดเบอร์เกอร์วันนี้', baht(sum)], ['รับเงินแล้ว', baht(paid)], ['ยังไม่ได้รับ', baht(sum - paid)], ['จำนวนชิ้น', pieces]
+  ].map(m => `<div class="metric"><div class="l">${m[0]}</div><div class="v">${m[1]}</div></div>`).join('');
+
+  const byCh = {}, byItem = {};
+  valid.forEach(o => { byCh[o.channel] = (byCh[o.channel] || 0) + 1; o.items.forEach(i => byItem[i.name] = (byItem[i.name] || 0) + i.qty); });
+  $('summary').innerHTML = valid.length ? `<table>
+    <tr><td colspan="2"><b>ช่องทาง</b></td></tr>
+    ${Object.entries(byCh).map(([k, v]) => `<tr><td>${CH[k]}</td><td style="text-align:right">${v} ออเดอร์ (${Math.round(v / valid.length * 100)}%)</td></tr>`).join('')}
+    <tr><td colspan="2" style="padding-top:10px"><b>เมนูขายดี</b></td></tr>
+    ${Object.entries(byItem).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<tr><td>${esc(k)}</td><td style="text-align:right">${v} ชิ้น</td></tr>`).join('')}
+  </table>` : '<p class="muted">ยังไม่มีออเดอร์วันนี้</p>';
+
+  renderFishPanel();
+}
+
+function renderFishPanel() {
+  const r = settings.fishRound;
+  if (!r && $('rLabel')) return; // ฟอร์มเปิดรอบอยู่ อย่ารีเฟรชทับสิ่งที่กำลังพิมพ์
+  const listOpen = $('fishPanel').querySelector('details')?.open;
+  let html = '<h2>🐟 รอบปลากระพง</h2>';
+  if (r) {
+    const list = orders.filter(o => o.fishRoundId === r.id && o.status !== 'rejected' && o.status !== 'cancelled');
+    const unpaid = list.filter(o => !o.paid).length;
+    const bySize = {}; list.forEach(o => o.items.forEach(i => bySize[i.name] = (bySize[i.name] || 0) + i.qty));
+    html += `<div><b>รอบส่ง ${esc(r.label)}</b> <span class="muted">ปิดรับ ${r.closeAt ? new Date(r.closeAt).toLocaleString('th-TH', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '-'}</span></div>
+      <div class="progress"><div style="width:${Math.min(100, settings.fishBooked / r.quota * 100)}%"></div></div>
+      <div class="muted">จองแล้ว ${settings.fishBooked}/${r.quota} ตัว · ${list.length} ราย · ยังไม่จ่าย ${unpaid} ราย</div>
+      <div class="muted">${Object.entries(bySize).map(([k, v]) => esc(k) + ': ' + v + ' ตัว').join(' · ')}</div>
+      <details style="margin-top:8px" ${listOpen ? 'open' : ''}><summary>รายชื่อส่ง/รับ (${list.length})</summary>
+        <table>${list.map(o => `<tr><td>#${o.id} ${esc(o.customerName)} ${o.phone ? '· ' + esc(o.phone) : ''}<br><span class="muted">${o.fulfil === 'delivery' ? '🛵 ' + esc(o.address) : '🏠 รับเอง'}</span></td>
+          <td style="text-align:right">${o.items.map(i => i.qty).reduce((a, b) => a + b, 0)} ตัว<br><span class="tag ${o.paid ? 't-paid' : 't-unpaid'}">${o.paid ? 'จ่ายแล้ว' : 'ยังไม่จ่าย'}</span></td></tr>`).join('')}</table>
+      </details>
+      <p><button class="btn ghost sm" onclick="closeRound()">ปิดรอบนี้ / เริ่มรอบใหม่</button></p>`;
+  } else {
+    html += `<p class="muted">ยังไม่เปิดรอบ — เปิดรอบแล้วลูกค้าจะจองในไลน์ได้</p>
+      <div class="row">
+        <label>รอบส่ง (ชื่อที่ลูกค้าเห็น)<input id="rLabel" placeholder="ศุกร์ 6 พ.ย."></label>
+        <label>ปิดรับจอง<input id="rClose" type="datetime-local"></label>
+        <label>จำนวนตัว<input id="rQuota" type="number" value="30" style="width:90px"></label>
+        <button class="btn" onclick="openRound()">เปิดรอบ</button>
+      </div><div class="err" id="rErr"></div>`;
+  }
+  $('fishPanel').innerHTML = html;
+}
+
+// ---------- การกระทำ ----------
+async function setStatus(uid, status) { await Store.updateOrder(uid, { status }); load(); }
+async function togglePaid(uid, paid) { await Store.updateOrder(uid, { paid }); load(); }
+async function flag(key, v) { await Store.flagCustomer(key, v); load(); }
+$('accepting').addEventListener('change', async e => { await Store.saveSettings({ accepting: e.target.checked }); load(); });
+async function openRound() {
+  const label = $('rLabel').value.trim(), closeAt = $('rClose').value, quota = +$('rQuota').value;
+  if (!label || !quota) { $('rErr').textContent = 'ใส่ชื่อรอบและจำนวนตัว'; return; }
+  await Store.saveSettings({ fishRound: { id: 'R' + Date.now(), label, closeAt: closeAt ? new Date(closeAt).toISOString() : '', quota } });
+  load();
+}
+async function closeRound() {
+  if (!confirm('ปิดรอบนี้? ออเดอร์เดิมยังอยู่ในระบบ')) return;
+  await Store.saveSettings({ fishRound: null }); load();
+}
+
+// ---------- เพิ่มออเดอร์ร้าน (โทร / Messenger / เฟส / หน้าร้าน) ----------
+let draft;
+function openAdd() {
+  draft = { type: 'burger', channel: 'phone', items: [], opts: {}, fulfil: 'pickup', paid: false };
+  $('addModal').classList.remove('hide'); renderAdd();
+}
+function renderAdd() {
+  const fishOpen = !!settings.fishRound;
+  const menu = draft.type === 'fish' ? cfg.fishSizes : cfg.burgers;
+  const o = { items: draft.items, deliveryFee: 0 };
+  $('addBody').innerHTML = `<h2>เพิ่มออเดอร์ร้าน</h2>
+    <div class="muted">มาจากช่องทาง</div>
+    <div class="chips">${['phone', 'messenger', 'facebook', 'walkin'].map(c => `<button class="chip ${draft.channel === c ? 'on' : ''}" onclick="draft.channel='${c}';renderAdd()">${CH[c]}</button>`).join('')}</div>
+    <div class="chips"><button class="chip ${draft.type === 'burger' ? 'on' : ''}" onclick="draft.type='burger';draft.items=[];renderAdd()">🍔 เบอร์เกอร์</button>
+      <button class="chip ${draft.type === 'fish' ? 'on' : ''}" onclick="${fishOpen ? "draft.type='fish';draft.items=[];renderAdd()" : "alert('ยังไม่เปิดรอบปลา')"}">🐟 ปลา${fishOpen ? ' (' + esc(settings.fishRound.label) + ')' : ''}</button></div>
+    ${draft.type === 'burger' ? `<div class="muted">ตัวเลือก (เลือกก่อนแล้วกดเมนู)</div><div class="chips">${cfg.burgerOptions.map(x => `<button class="chip opt ${draft.opts[x.id] ? 'on' : ''}" onclick="draft.opts['${x.id}']=!draft.opts['${x.id}'];renderAdd()">${x.name} +${x.price}</button>`).join('')}</div>` : ''}
+    <div class="menu-grid">${menu.map(m => `<button class="menu-btn" onclick="addItem('${m.id}')">${esc(m.name)}<br><b>${m.price} ฿</b></button>`).join('')}</div>
+    <div style="margin:10px 0">${draft.items.map((i, n) => `<div class="top" style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line)"><span>${esc(i.name)}${i.options.length ? ' <span class="muted">+ ' + i.options.map(x => x.name).join(', ') + '</span>' : ''} x${i.qty}</span><span>${baht(Store.itemPrice(i))} <button class="btn ghost sm" onclick="draft.items.splice(${n},1);renderAdd()">ลบ</button></span></div>`).join('') || '<span class="muted">ยังไม่มีรายการ</span>'}
+      <div style="text-align:right;margin-top:6px"><b>รวม ${baht(Store.orderTotal(o))}</b></div></div>
+    <div class="row">
+      <label>ชื่อลูกค้า<input id="aName" value="${esc(draft.name)}"></label>
+      <label>เบอร์โทร<input id="aPhone" type="tel" value="${esc(draft.phone)}"></label>
+    </div>
+    <div class="chips"><button class="chip ${draft.fulfil === 'pickup' ? 'on' : ''}" onclick="keepFields();draft.fulfil='pickup';renderAdd()">รับเอง</button><button class="chip ${draft.fulfil === 'delivery' ? 'on' : ''}" onclick="keepFields();draft.fulfil='delivery';renderAdd()">ส่ง</button></div>
+    ${draft.fulfil === 'delivery' ? `<input id="aAddr" placeholder="ที่อยู่ส่ง" value="${esc(draft.address)}" style="width:100%">` : ''}
+    ${draft.type === 'burger' ? `<div class="row" style="margin-top:6px"><label>เวลารับ/ส่ง (ว่าง = เร็วที่สุด)<input id="aTime" type="time" value="${esc(draft.time)}"></label></div>` : ''}
+    <label class="toggle" style="margin:10px 0"><input type="checkbox" id="aPaid" ${draft.paid ? 'checked' : ''}> รับเงินแล้ว</label>
+    <div class="err" id="aErr"></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn ghost" onclick="$('addModal').classList.add('hide')">ยกเลิก</button><button class="btn" onclick="saveAdd()">บันทึกออเดอร์</button></div>`;
+}
+function keepFields() {
+  ['aName:name', 'aPhone:phone', 'aAddr:address', 'aTime:time'].forEach(p => { const [id, k] = p.split(':'); if ($(id)) draft[k] = $(id).value; });
+  if ($('aPaid')) draft.paid = $('aPaid').checked;
+}
+function addItem(id) {
+  keepFields();
+  const m = (draft.type === 'fish' ? cfg.fishSizes : cfg.burgers).find(x => x.id === id);
+  const options = draft.type === 'burger' ? cfg.burgerOptions.filter(x => draft.opts[x.id]).map(x => ({ id: x.id, name: x.name, price: x.price })) : [];
+  const key = id + '|' + options.map(x => x.id).join(',');
+  const ex = draft.items.find(i => i.key === key);
+  if (ex) ex.qty++; else draft.items.push({ key, id, name: m.name, unitPrice: m.price, qty: 1, options });
+  draft.opts = {}; renderAdd();
+}
+async function saveAdd() {
+  keepFields();
+  const order = { type: draft.type, channel: draft.channel, items: draft.items.map(({ key, ...i }) => i),
+    customerName: draft.name || CH[draft.channel], phone: draft.phone || '', customerKey: draft.phone ? 'phone:' + draft.phone : '',
+    fulfil: draft.fulfil, address: draft.address || '', time: draft.time || 'asap', payment: draft.paid ? 'transfer' : 'shop',
+    fishRoundId: draft.type === 'fish' ? settings.fishRound.id : '', note: '', deliveryFee: 0 };
+  try {
+    const saved = await Store.createOrder(order);
+    if (draft.paid !== saved.paid) await Store.updateOrder(saved.uid, { paid: draft.paid });
+    $('addModal').classList.add('hide'); load();
+  } catch (e) { $('aErr').textContent = e.message; }
+}
+$('addBtn').addEventListener('click', openAdd);
+
+// ---------- เริ่ม ----------
+async function start() {
+  await load();
+  setInterval(load, 10000);
+}
+if (Store.DEMO) {
+  $('demoTag').classList.remove('hide'); $('demoTools').classList.remove('hide');
+  $('resetBtn').onclick = () => { if (confirm('ล้างข้อมูลเดโมทั้งหมด?')) { Store.resetAll(); load(); } };
+  window.addEventListener('storage', load);
+  start();
+} else {
+  $('pinGate').classList.remove('hide');
+  $('pinBtn').onclick = async () => {
+    Store.setPin($('pinInput').value);
+    try { await Store.listOrders(); $('pinGate').classList.add('hide'); start(); }
+    catch (e) { $('pinErr').textContent = e.message; }
+  };
+}
+</script>
+</body>
+</html>
